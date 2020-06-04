@@ -16,26 +16,18 @@ def percent_abusive(data):
     to_return = []  # [[source (str), percent (float)], ...]
     q = Queue()
 
-    filename = "data/lexicon_manual/lexicon.manual.all.abusive.csv"
-    lexicon_rds = pd.read_csv(filename, sep=",", header=0)
-    boost_list = list(lexicon_rds)
-    p1 = Process(target=boost_multithreaded, args=(data, "manual", boost_list, q,))
-    jobs.append(p1)
-    p1.start()
+    filenames = ["data/lexicon_manual/lexicon.manual.all.abusive.csv",
+                 "data/lexicon_wiegand/lexicon.wiegand.base.abusive.csv",
+                 "data/lexicon_wiegand/lexicon.wiegand.expanded.abusive.csv"]
 
-    filename = "data/lexicon_wiegand/lexicon.wiegand.base.abusive.csv"
-    lexicon_wiegand_base = pd.read_csv(filename, sep=",", header=0)
-    boost_list = list(lexicon_wiegand_base)
-    p2 = Process(target=boost_multithreaded, args=(data, "Wiegand (Base)", boost_list, q,))
-    jobs.append(p2)
-    p2.start()
+    for f in filenames:
+        f_split = f.split(".", 3)
+        source = f_split[1] + "." + f_split[2]
 
-    filename = "data/lexicon_wiegand/lexicon.wiegand.expanded.abusive.csv"
-    lexicon_wiegand_exp = pd.read_csv(filename, sep=",", header=0)
-    boost_list = list(lexicon_wiegand_exp)
-    p3 = Process(target=boost_multithreaded, args=(data, "Wiegand (Expanded)", boost_list, q,))
-    jobs.append(p3)
-    p3.start()
+        boost_list = open(f).read().splitlines()
+        p = Process(target=boost_multithreaded, args=(data, source, boost_list, q,))
+        jobs.append(p)
+        p.start()
 
     # multithreaded boosting; waits for all jobs to finish
     for process in jobs:
@@ -49,8 +41,8 @@ def percent_abusive(data):
 
         to_return.append([pct, name])
 
+    # return dataframe
     to_return = pd.DataFrame(to_return, columns=["percent_abusive", "source"])
-    print(to_return)  # DEBUG
     return to_return
 
 
@@ -65,7 +57,6 @@ def boost_multithreaded(data, source, manual_boost, queue):
     - Return
         - Tuple containing the boosted data and a name: (df, str,)
     """
-
 
     boosted_data = boost_data(data, "", False, manual_boost)
 

@@ -180,18 +180,18 @@ def export_lexicons():
 
     # filter out non-abusive words
     base_abusive = base[base["class"]]["word"]
-    exp_abusive = exp[exp["score"] > 0]["word"]  # according to "Introducing a Lexicon of Abusive Words"
+    exp_abusive = exp[exp["score"] > 0]["word"]  # >0 according to "Introducing a Lexicon of Abusive Words"
     rds_abusive = rds[rds["class"]]["word"]
 
     # export
     os.chdir("lexicon_wiegand")
-    base.to_csv("lexicon.wiegand.base.csv", header=0, index=False)
-    exp.to_csv("lexicon.wiegand.expanded.csv", header=0, index=False)
-    base_abusive.to_csv("lexicon.wiegand.base.abusive.csv", header=0, index=False)
-    exp_abusive.to_csv("lexicon.wiegand.expanded.abusive.csv", header=0, index=False)
+    base.to_csv("lexicon.wiegand.base.csv", sep=",", header=0, index=False)
+    exp.to_csv("lexicon.wiegand.expanded.csv", sep=",", header=0, index=False)
+    base_abusive.to_csv("lexicon.wiegand.base.abusive.csv", sep=",", header=0, index=False)
+    exp_abusive.to_csv("lexicon.wiegand.expanded.abusive.csv", sep=",", header=0, index=False)
 
-    os.chdir("lexicon_manual")
-    rds_abusive.to_csv("lexicon.manual.all.abusive.csv", header=0, index=False)
+    os.chdir("../lexicon_manual")
+    rds_abusive.to_csv("lexicon.manual.all.abusive.csv", sep=",", header=0, index=False)
 
     os.chdir(cwd)  # go back to previous cwd
 
@@ -199,3 +199,4 @@ def export_lexicons():
 """ MAIN """
 topic = ["trump"]  # [str]
 to_build = "all"  # "all", "random", or "boosted"
+export_lexicons()

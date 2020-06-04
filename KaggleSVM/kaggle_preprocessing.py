@@ -57,7 +57,7 @@ def boost_data(data, data_file, verbose=True, manual_boost=None):
     if verbose:
         print(f"Boosting data...") if verbose else None
 
-        if manual_boost:
+        if not manual_boost.empty:
             print(f"Filtering `{data_file}` on {manual_boost}...")
         else:
             print(f"Filtering `{data_file}` on wordbank...")
