@@ -1,5 +1,5 @@
 # Introduction & Research Goals 
-The goal of this project was to improve both implicit abusive language detection. **Python** was used for data preprocessing, dataset builds, and SVM training. **R** was used to verify dataset properties (e.g. length, headers, etc.). The paper was written in and compiled from **LaTeX**.
+The goal of this project is to improve abusive language detection, with a focus on implicit abuse. **Python** was used for data preprocessing, dataset builds, and SVM training. **R** was used to verify dataset properties (e.g. length, headers, etc.). The paper was written in and compiled from **LaTeX**.
 
 ## Paper
 The paper is a WIP but will include detailed research methods, results, citations, and more.
