@@ -22,7 +22,7 @@ This repository contains all of the resources you will need to replicate results
 - `git clone https://github.com/danterazo/abusive-language-detection.git`
   
 3. Configure
-    - See the main in `kaggle_train.py`
+    - See the `main()` in `kaggle_train.py`
         | Variable     | Data Type    | Default Value | Possible Values                                      | Purpose                                                      |
         | ------------ | ------------ | ------------- | ---------------------------------------------------- | ------------------------------------------------------------ |
         | `samples`      | *str*        | **"all"**     | "random", "boosted_topic", "boosted_wordbank", "all" | Lets the user choose which sample types to train on.         |
