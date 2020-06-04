@@ -16,21 +16,21 @@ def percent_abusive(data):
     to_return = []  # [[source (str), percent (float)], ...]
     q = Queue()
 
-    filename = "data/lexicon_manual/lexicon.manual.all.abusive.csv"
+    filename = "../data/kaggle_data/lexicon_manual/lexicon.manual.all.abusive.csv"
     lexicon_rds = pd.read_csv(filename, sep=",", header=0)
     boost_list = list(lexicon_rds)
     p1 = Process(target=boost_multithreaded, args=(data, "manual", boost_list, q,))
     jobs.append(p1)
     p1.start()
 
-    filename = "data/lexicon_wiegand/lexicon.wiegand.base.abusive.csv"
+    filename = "../Data/kaggle_data/lexicon_wiegand/lexicon.wiegand.base.abusive.csv"
     lexicon_wiegand_base = pd.read_csv(filename, sep=",", header=0)
     boost_list = list(lexicon_wiegand_base)
     p2 = Process(target=boost_multithreaded, args=(data, "Wiegand (Base)", boost_list, q,))
     jobs.append(p2)
     p2.start()
 
-    filename = "data/lexicon_wiegand/lexicon.wiegand.expanded.abusive.csv"
+    filename = "../Data/kaggle_data/lexicon_wiegand/lexicon.wiegand.expanded.abusive.csv"
     lexicon_wiegand_exp = pd.read_csv(filename, sep=",", header=0)
     boost_list = list(lexicon_wiegand_exp)
     p3 = Process(target=boost_multithreaded, args=(data, "Wiegand (Expanded)", boost_list, q,))
