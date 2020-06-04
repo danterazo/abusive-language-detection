@@ -4,12 +4,12 @@ The goal of this project was to improve both implicit abusive language detection
 ## Paper
 The paper is a WIP but will include detailed research methods, results, citations, and more.
 
-See `Paper` for uncompiled LaTeX and assets. The final paper will be in the root directory.
+See `Paper\` for uncompiled LaTeX and assets. The final paper will be in the root directory.
 
 The plan is to submit this paper to the [_Fourth Workshop on Online Abuse and Harms_](https://www.aclweb.org/portal/content/fourth-workshop-online-abuse-and-harms) (WOAH), co-located with the 2020 conference on _Empirical Methods in Natural Language Processing_ (EMNLP 2020).
 
 # Code
-This repository contains all of the resources you will need to replicate results. Boosting data takes an absurd amount of time depending on the lexicon used, so I recommend using a computer with at least **4c/4t** and **16GB** of memory. Again, this is a recommendation and not a requirement.
+This repository contains all of the resources you will need to replicate results. Boosting data takes an absurd amount of time depending on the lexicon used; I recommend using a computer with at least **4c/4t** and **16GB** of memory. Again, this is a recommendation and not a requirement.
 
 ## Running the script
 1. Install dependencies
@@ -138,7 +138,7 @@ Strips unnecessary columns from my manually-tagged lexicon.
     - None
 
 ##### `lexicon_dd()`
-Strips unnecessary columns from DD's manually-tagged lexicon, then convert text classes to ints.
+Strips unnecessary columns from DD's manually-tagged lexicon (`.tsv`), then convert text classes to ints.
 - Params
     - `filename` (*str*): the name of the csv to be read
 - Return
@@ -147,7 +147,7 @@ Strips unnecessary columns from DD's manually-tagged lexicon, then convert text 
     - None
 
 ##### `lexicon_schaede()`
-Strips unnecessary columns from Schaede's manually-tagged lexicon, then convert text classes to ints.
+Strips unnecessary columns from Schaede's manually-tagged lexicon (`.csv`), then convert text classes to ints.
 - Params
     - `filename` (*str*): the name of the csv to be read
 - Return
