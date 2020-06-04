@@ -16,19 +16,21 @@ This repository contains all of the resources you will need to replicate results
     - **Pip**: `pip3 install -r requirements.txt`
     - **Conda**: `conda install --file requirements.txt`
       - Select the desired conda `env` before installing
+      - See `nlpGPU_env.yml` for my NLP-focused conda env
 
 2. Clone
-    - `git clone https://github.com/danterazo/abusive-language-detection.git`
-
+   
+- `git clone https://github.com/danterazo/abusive-language-detection.git`
+  
 3. Configure
     - See the main in `kaggle_train.py`
         | Variable     | Data Type    | Default Value | Possible Values                                      | Purpose                                                      |
         | ------------ | ------------ | ------------- | ---------------------------------------------------- | ------------------------------------------------------------ |
-        | `samples`      | *str*        | **"all"**     | "random", "boosted_topic", "boosted_wordbank", "all" | Lets the user choose which sample types to train on          |
-        | `analyzer`     | *str*        | **"word"**    | "char", "word"                                       | Toggle n-gram analyzer                                 |
-        | `ngram_range`  | *(int, int)* | **(1,3)**     | {i &#124; i&isin; Z<sup>+</sup>}                     | Lower and upper n-gram boundaries                            |
-        | `manual_boost` | *[str]*      | **["trump"]** | any array of strings whose length, **None**          | If not **None**, override predefined wordbanks when boosting |
-        | `rebuild`      | *bool*       | **False**     | True, False                                          | If **True**, resample + rebuild training data. Computationally expensive |
+        | `samples`      | *str*        | **"all"**     | "random", "boosted_topic", "boosted_wordbank", "all" | Lets the user choose which sample types to train on.         |
+        | `analyzer`     | *str*        | **"word"**    | "char", "word"                                       | Toggle n-gram analyzer.                                |
+        | `ngram_range`  | *(int, int)* | **(1,3)**     | {i &#124; i&isin; Z<sup>+</sup>}                     | Lower and upper n-gram boundaries.                           |
+        | `manual_boost` | *[str]*      | **["trump"]** | any array of strings whose length, **None**          | If not **None**, override predefined wordbanks when boosting. |
+        | `rebuild`      | *bool*       | **False**     | True, False                                          | If **True**, resample + rebuild training data and lexicons. The former is computationally expensive. |
         | `repeats`      | *int*        | **3**         | {i &#124; i &isin; Z<sup>+</sup>, i > 0}             | Set the number of each sample type to build and train. Ignored if `rebuild` is **False**. |
         | `sample_size`  | *int*        | **20000**     | {i &#124; i &isin; Z<sup>+</sup>, i > 0}             | Set the size of each dataset when building. If any set has <2000 examples, the others will be trimmed to match it. Ignored if `rebuild` is **False**. |
         | `verbose`      | *bool*       | **True**      | True, False                                          | Controls verbose print statements. Passed to other functions like a react prop. |
@@ -44,27 +46,67 @@ This repository contains all of the resources you will need to replicate results
     - **Class predictions** can be found in `output\pred\`
     - **Classification reports** can be found in `output\report\`
 
-
-
 ## Nomenclature
-RDS
+Throughout the code I refer to our manually-tagged lexicon, based off Wiegand's base lexicon, as either *manualLexicon*
+or *rds*, the latter being the initials of the contributors' last names (Dante Razo, DD, Leah Schaede).
 
 
 
 ## Files
-In order of execution:
+### kaggle_build.py
+This file exports data for later use. Included in the repo is prebuilt data, so its not necessary to run this script.
 
-### `kaggle_build.py`
-This file builds, imports, and exports data stored locally.
+To run, set the `rebuild` flag in `kaggle_train.py` to **TRUE** then run the latter file.
+
 #### `build_train()`
+Builds and exports sampled training sets from large `train.csv` dataset
 
-### `kaggle_preprocessing.py`
+##### `get_train()`
+Quick function to import `train.target+comments.tsv` + call `kaggle_preprocessing.read_data()` to format it
+
+##### `build_random()`
+Call `kaggle_preprocessing.sample_data()` to shuffle + cut `train.csv` down to desired sample size
+
+##### `build_boosted()`
+Call `kaggle_preprocessing.boost_data()` to boost `train.target+comments.tsv` on built-in wordbank or user-defined
+wordbank (passed as param).
+
+
+
+#### `export_lexicons`
+##### `build_manual_lexicon()`
+##### `lexicon_dante()`
+##### `lexicon_dd()`
+##### `lexicon_schaede()`
+
+#### `export_data()`
+#### `export_df()`
+
+
+### kaggle_preprocessing.py
 This file reformats and cleans the data from `kaggle_build.py` into something the SVM can use.
 
-### `kaggle_train.py`
+#### `read_data()`
+#### `sample_data()`
+#### `boost_data()`
+
+
+### kaggle_train.py
 This file trains `n` SVMs for all three sample types, with `n` being the `repeats` flag.
 
-### `kaggle_postprocessing.py`
+#### `fit_data()`
+This is where the magic happens. Fits CountVectorizer, trains SVM, and prints + exports results per dataset.
+
+#### `import_data()`
+Helper function that queues datasets to be trained.
+
+
+### kaggle_postprocessing.py
+If postprocessing wasn't already a word, it is now. This contains helper functions that work with data that has already
+been trained or processed.
+
+#### `percent_abusive()`
+#### `boost_multithreaded()`
 
 
 
