@@ -1,2 +1,0 @@
-If you need to split FA19 + SP20 from SU20, check out the link below:
-https://help.github.com/en/github/using-git/splitting-a-subfolder-out-into-a-new-repository

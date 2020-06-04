@@ -1,5 +1,0 @@
-1. Why didn't NLP research start until 2000? Surely the concepts must have come up before then.
-
-2. How can we teach a machine to distinguish between regular and comparative opinions?
-
-3. I don't entirely understand what an "aspect" is in the context of models.
