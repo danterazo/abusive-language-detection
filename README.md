@@ -41,9 +41,9 @@ This repository contains all of the resources you will need to replicate results
 
 5. Wait patiently for results
     - Percentage calculation (see `calc_pct` above) is multithreaded for mild performance improvements.
-    - **Rebuilt datasets** can be found in `data\`
-    - **Class predictions** can be found in `output\pred\`
-    - **Classification reports** can be found in `output\report\`
+    - **Rebuilt datasets** can be found in `data/`
+    - **Class predictions** can be found in `output/pred/`
+    - **Classification reports** can be found in `output/report/`
 
 ## Nomenclature
 Throughout the code I refer to our manually-tagged lexicon, based off Wiegand's base lexicon, as either *manualLexicon*
@@ -85,7 +85,7 @@ Call `kaggle_preprocessing.sample_data()` to shuffle + cut `train.csv` down to d
 - Return
     - None
 - Write
-    - `data\train.random{i}.csv` for index `i`
+    - `data/train.random{i}.csv` for index `i`
     
 
 #### `build_boosted()`
@@ -99,7 +99,7 @@ wordbank (passed as param `manual_boost`).
 - Return
     - None
 - Write
-    - `data\train.boosted{i}.csv` for index `i`
+    - `data/train.boosted{i}.csv` for index `i`
 
 
 ### `export_lexicons()`
@@ -110,12 +110,12 @@ left it in `kaggle_build.py` because it also exports them.
 - Return
     - None
 - Write
-    - `data\lexicon_wiegand\`
+    - `data/lexicon_wiegand/`
         - `lexicon.wiegand.base.csv`
         - `lexicon.wiegand.expanded.csv`
         - `lexicon.wiegand.base.abusive.csv`
         - `lexicon.wiegand.expanded.abusive.csv`
-    - `data\lexicon_manual\`
+    - `data/lexicon_manual/`
         - `lexicon.manual.all.abusive.csv`
 
 #### `build_manual_lexicon()`
@@ -126,7 +126,7 @@ it combines them into one dataframe and exports it.
 - Return
     - None
 - Write
-    - `data\manual_lexicon\lexicon.manual.all`
+    - `data/manual_lexicon/lexicon.manual.all`
 
 ##### `lexicon_dante()`
 Strips unnecessary columns from my manually-tagged lexicon.
@@ -164,7 +164,7 @@ Writes the given DataFrame to storage.
 - Return
     - None
 - Write
-    - `data\train.{sample_name}{i}{extension}` for index `i`
+    - `data/train.{sample_name}{i}{extension}` for index `i`
 
 ### `export_df()`
 A more generalized version of `export_data()`. Doesn't prepend "train" to the filename and allows different filepaths.
@@ -178,7 +178,7 @@ A more generalized version of `export_data()`. Doesn't prepend "train" to the fi
 - Return
     - None
 - Write
-    - `{path}\{prefix}.{sample}{i}.csv`
+    - `{path}/{prefix}.{sample}{i}.csv`
 
 
 ## kaggle_preprocessing.py
@@ -237,9 +237,9 @@ This is where the magic happens. Fits CountVectorizer, trains SVM, and prints + 
 - Return
     - None
 - Write
-    - `output\pred\pred.{sample_type}{i}` for index `i` and string `sample_type`, both defined in-function
-    - `output\stats\percent.{sample_type}{i}` if `calc_pct` is **TRUE**
-    - `output\report\report.{sample_type}{i}`
+    - `output/pred/pred.{sample_type}{i}` for index `i` and string `sample_type`, both defined in-function
+    - `output/stats/percent.{sample_type}{i}` if `calc_pct` is **TRUE**
+    - `output/report/report.{sample_type}{i}`
 
 ### `import_data()`
 Helper function that queues datasets to be trained *per sample*. It reads `n` sets for the given `sample_type`
