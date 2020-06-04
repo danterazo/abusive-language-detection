@@ -199,4 +199,4 @@ def export_lexicons():
 """ MAIN """
 topic = ["trump"]  # [str]
 to_build = "all"  # "all", "random", or "boosted"
-export_lexicons()
+# export_lexicons()
