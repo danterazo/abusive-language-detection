@@ -86,7 +86,6 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
             # calculate % abusive (multithreaded)
             pct_path = os.path.join("output/stats/", f"percent.{sample_type.lower()}{i}.csv")
             if calc_pct:
-
                 if path.exists(pct_path):
                     print(f"\nImporting {sample_type}-sample abusive content percentages...")
                     pct = pd.read_csv(pct_path)  # import if already computed
