@@ -26,7 +26,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
     rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
     samples ([str]):    three modes: "random", "boosted", or "all"
     analyzer (str):     either "word" or "char". for CountVectorizer
-    ngram_range ((int,)):   tuple containing lower and upper ngram bounds for CountVectorizer
+    ngram_range ((int,int)):   tuple containing lower and upper ngram bounds for CountVectorizer
     manual_boost ([str]):   use given array of strings for filtering instead of built-in wordbanks. Or pass `None`
     repeats (int):      controls the number of datasets built per sample type (if `rebuild` is TRUE)
     verbose (boolean):  toggles print statements
@@ -100,7 +100,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
 def import_data(sample_type, n):
     to_return = []
 
-    for i in range(1, n+1):
+    for i in range(1, n + 1):
         to_return.append(read_data(f"train.{sample_type}{i}.csv", verbose=False))
 
     return to_return
@@ -112,7 +112,7 @@ if __name__ == '__main__':
     if run is 1:
         samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
         analyzer = "word"  # "char" or "word"
-        ngram_range = (1, 3)  # int 2-tuple / couple
+        ngram_range = (1, 3,)  # int 2-tuple (couple)
         manual_boost = ["trump"]  # ["trump"]  # None, or an array of strings
         rebuild = False  # rebuild datasets + export
         repeats = 3  # number of datasets per sample type
