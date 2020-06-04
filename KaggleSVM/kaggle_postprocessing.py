@@ -1,5 +1,5 @@
 # LING-X 490
-# This standalone file takes built data and reformats / averages / analyzes it
+# This file takes built data and reformats / averages / analyzes it
 # Dante Razo, drazo
 from kaggle_preprocessing import boost_data
 from multiprocessing import Process, Queue

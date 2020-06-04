@@ -1,5 +1,5 @@
 # LING-X 490: Abusive Language Detection
-# Started FA19, finished SU20
+# This file trains SVMs on uniquely-sampled datasets
 # Dante Razo, drazo, 2020-05-15
 
 from kaggle_preprocessing import read_data
