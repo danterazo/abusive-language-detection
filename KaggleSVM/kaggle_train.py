@@ -103,19 +103,18 @@ def import_data(sample_type):
     return to_return
 
 
-""" SCRIPT CONFIG """
-samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
-analyzer = "word"  # "char" or "word"
-ngram_range = (1, 3)  # int 2-tuple / couple
-manual_boost = ["trump"]  # ["trump"]  # None, or an array of strings
-rebuild = False  # rebuild datasets + export
-repeats = 3  # number of datasets per sample type
-verbose = True  # suppresses prints if FALSE
-calc_pct = True  # calculate abusive example percentage per sample
-sample_size = 20000
-
 """ MAIN """
 # need main for multithreaded boosting
 if __name__ == '__main__':
     if run is 1:
+        samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
+        analyzer = "word"  # "char" or "word"
+        ngram_range = (1, 3)  # int 2-tuple / couple
+        manual_boost = ["trump"]  # ["trump"]  # None, or an array of strings
+        rebuild = False  # rebuild datasets + export
+        repeats = 3  # number of datasets per sample type
+        verbose = True  # suppresses prints if FALSE
+        calc_pct = True  # calculate abusive example percentage per sample
+        sample_size = 20000
+
         fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct)
