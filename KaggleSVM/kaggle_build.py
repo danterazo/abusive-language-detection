@@ -49,7 +49,7 @@ def export_data(source, data, extension=".csv"):
     i = 1
 
     for d in data:
-        filepath = os.path.join("../data/kaggle_data", f"train.{source}{i}{extension}")
+        filepath = os.path.join("data", f"train.{source}{i}{extension}")
         d.to_csv(filepath, index=False, header=False)
         i += 1
 
@@ -160,7 +160,7 @@ def lexicon_schaede(filename):
 # in `kaggle_build.py` because it isn't dynamic, i.e. the output is the same after every run
 def export_lexicons():
     cwd = os.getcwd()
-    os.chdir("../data/kaggle_data")
+    os.chdir("data")
 
     # read lexicons; Wiegand lexicons are provided and don't need to be built
     base = pd.read_csv(f"lexicon_wiegand/baseLexicon.txt", sep='\t', header=None, names=["word", "class"])
@@ -189,7 +189,7 @@ def export_lexicons():
     base_abusive.to_csv("lexicon.wiegand.base.abusive.csv", header=0, index=False)
     exp_abusive.to_csv("lexicon.wiegand.expanded.abusive.csv", header=0, index=False)
 
-    os.chdir("../lexicon_manual")
+    os.chdir("lexicon_manual")
     rds_abusive.to_csv("lexicon.manual.all.abusive.csv", header=0, index=False)
 
     os.chdir(cwd)  # go back to previous cwd
