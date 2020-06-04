@@ -19,7 +19,6 @@ This repository contains all of the resources you will need to replicate results
       - See `nlpGPU_env.yml` for my NLP-focused conda env
 
 2. Clone
-   
 - `git clone https://github.com/danterazo/abusive-language-detection.git`
   
 3. Configure
@@ -51,7 +50,6 @@ Throughout the code I refer to our manually-tagged lexicon, based off Wiegand's 
 or *rds*, the latter being the initials of the contributors' last names (Dante Razo, DD, Leah Schaede).
 
 
-
 # Files
 ## kaggle_build.py
 This file exports data for later use. Included in the repo is prebuilt data, so its not necessary to run this script.
@@ -74,7 +72,7 @@ Quick function to import `train.target+comments.tsv` + call `kaggle_preprocessin
 - Params
     - None
 - Return
-    - Preprocessed full train dataset (*df*)
+    - Preprocessed full training dataset: (*df*)
 - Write
     - None
 
@@ -135,7 +133,7 @@ Strips unnecessary columns from my manually-tagged lexicon.
 - Params
     - `filename` (*str*): the name of the csv to be read
 - Return
-    - Processed lexicon (*df*)
+    - Processed lexicon: (*df*)
 - Write
     - None
 
@@ -144,7 +142,7 @@ Strips unnecessary columns from DD's manually-tagged lexicon, then convert text 
 - Params
     - `filename` (*str*): the name of the csv to be read
 - Return
-    - Processed lexicon (*df*)
+    - Processed lexicon: (*df*)
 - Write
     - None
 
@@ -153,7 +151,7 @@ Strips unnecessary columns from Schaede's manually-tagged lexicon, then convert 
 - Params
     - `filename` (*str*): the name of the csv to be read
 - Return
-    - Processed lexicon (*df*)
+    - Processed lexicon: (*df*)
 - Write
     - None
 
@@ -182,6 +180,7 @@ A more generalized version of `export_data()`. Doesn't prepend "train" to the fi
 - Write
     - `{path}\{prefix}.{sample}{i}.csv`
 
+
 ## kaggle_preprocessing.py
 This file reformats and cleans the data from `kaggle_build.py` into something the SVM can use.
 
@@ -192,7 +191,7 @@ file delimiter. Removes entries with missing values (there's only 1 in `train.ta
     - `dataset` (*str*): filename of dataset to import
     - `verbose` (*verbose*): toggles print statements; default True
 - Return
-    - Clean delimited data (*df*)
+    - Clean delimited data: (*df*)
 - Write
     - None
 
@@ -202,7 +201,7 @@ Given a DataFrame, shuffle it and cut it down to the given size.
     - `data` (*df*): data to sample
     - `size` (*int*): sample size
 - Return
-    - Sampled data (*df*)
+    - Sampled data: (*df*)
 - Write
     - None
 
@@ -215,9 +214,10 @@ of those words instead.
     - `verbose` (*bool*): controls verbosity; default *TRUE*
     - `manual_boost` (*[str]*, or *None*): user-defined wordbank to boost on; default *None*
 - Return
-    - Boosted data (*df*)
+    - Boosted data: (*df*)
 - Write
     - None
+
 
 ## kaggle_train.py
 This file trains `n` SVMs for all three sample types, with `n` being the `repeats` flag.
@@ -238,8 +238,8 @@ This is where the magic happens. Fits CountVectorizer, trains SVM, and prints + 
     - None
 - Write
     - `output\pred\pred.{sample_type}{i}` for index `i` and string `sample_type`, both defined in-function
+    - `output\stats\percent.{sample_type}{i}` if `calc_pct` is **TRUE**
     - `output\report\report.{sample_type}{i}`
-    - `output`
 
 ### `import_data()`
 Helper function that queues datasets to be trained *per sample*. It reads `n` sets for the given `sample_type`
@@ -247,7 +247,7 @@ Helper function that queues datasets to be trained *per sample*. It reads `n` se
     - `sample_type` (*str*): part of filename, used for reading it into memory
     - `n` (*int*): number of files per sample
 - Return
-    - List of DataFrames (*[df]*)
+    - List of DataFrames: (*[df]*)
 - Write
     - None
 
@@ -257,19 +257,31 @@ If postprocessing wasn't already a word, it is now. This contains helper functio
 been trained or processed.
 
 ### `percent_abusive()`
-This calculates
+This calculates how much of `data` is considered abusive. Uses all three lexicons: *manual*, *Wiegand Base*, and 
+*Wiegand Extended*. Returns a DataFrame with a column of lexicon names and calculated percentages.
+
+Utilizes the `multiprocessing` library for Python. The dataset is boosted on all three lexicons in parallel. Note that
+the *Wiegand Expanded* lexicon is extremely long and boosting on it takes a lot of time.
 
 - Params
-    -
+    - `data` (*df*): dataframe to calculate abusive contents of
 - Return
+    - DataFrame of results: (*df*)
 - Write
+    - None
 
-### `boost_multithreaded()`
+#### `boost_multithreaded()`
+Calls `kaggle_preprocessing.boost_data()` and adds the result to a `multiprocessing.Queue` object. Returns both.
 - Params
+    - `data` (*df*): dataframe to boost
+    - `source` (*str*): lexicon name
+    - `manual_boost` (*[str]*): wordbank derived from the `source` lexicon
+    - `queue` (*`multiprocessing.Queue` object*): used to run all boosting jobs concurrently
 - Return
+    - Tuple containing the boosted dataset and the lexicon name: (*(df, str,)*)
 - Write
+    - None
 
 
-
-
-
+# Afterword
+Thanks for reading, and happy training!

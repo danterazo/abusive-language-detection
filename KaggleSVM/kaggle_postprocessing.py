@@ -56,6 +56,17 @@ def percent_abusive(data):
 
 # multiprocess `boost_data()`
 def boost_multithreaded(data, source, manual_boost, queue):
+    """
+    - Params
+        - data (df): dataframe to boost
+        - source (str): lexicon name
+        - manual_boost ([str]): wordbank derived from the `source` lexicon
+        - queue (multiprocessing.Queue object): used to run all boosting jobs concurrently
+    - Return
+        - Tuple containing the boosted data and a name: (df, str,)
+    """
+
+
     boosted_data = boost_data(data, "", False, manual_boost)
 
     queue.put(boosted_data)

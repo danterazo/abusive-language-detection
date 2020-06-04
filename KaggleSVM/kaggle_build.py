@@ -45,11 +45,11 @@ def build_boosted(data, manual_boost, sample_size, repeats=3):
 
 
 # save data to `.tsv`, `.csv`, etc.
-def export_data(source, data, extension=".csv"):
+def export_data(sample_name, data, extension=".csv"):
     i = 1
 
     for d in data:
-        filepath = os.path.join("data", f"train.{source}{i}{extension}")
+        filepath = os.path.join("data", f"train.{sample_name}{i}{extension}")
         d.to_csv(filepath, index=False, header=False)
         i += 1
 
@@ -63,8 +63,9 @@ def export_df(data, sample="no_sample", i="", path="", prefix="", index=True):
 # builds one or both
 def build_train(choice, topic, repeats, sample_size, verbose):
     """
-    choice: choose which sample types to build. "random", "boosted", or "all"
-    topic: topic for manual boosting
+    choice (str): choose which sample types to build. "random", "boosted", or "all"
+    topic ([str]): topic for manual boosting
+    repeats (int): number of datasets to build per sample type
     """
     train = get_train()
 
@@ -198,5 +199,3 @@ def export_lexicons():
 """ MAIN """
 topic = ["trump"]  # [str]
 to_build = "all"  # "all", "random", or "boosted"
-# build_train(to_build, topic)
-# export_lexicons()

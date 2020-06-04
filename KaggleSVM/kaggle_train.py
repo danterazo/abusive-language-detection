@@ -26,7 +26,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
     rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
     samples ([str]):    three modes: "random", "boosted", or "all"
     analyzer (str):     either "word" or "char". for CountVectorizer
-    ngram_range (()):   tuple containing lower and upper ngram bounds for CountVectorizer
+    ngram_range ((int,)):   tuple containing lower and upper ngram bounds for CountVectorizer
     manual_boost ([str]):   use given array of strings for filtering instead of built-in wordbanks. Or pass `None`
     repeats (int):      controls the number of datasets built per sample type (if `rebuild` is TRUE)
     verbose (boolean):  toggles print statements
@@ -42,7 +42,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
     # struct example: [([random1, random2, ..., random_n], "random"), ...]
     all_data = []
     for x in ["random", "topic", "wordbank"]:
-        all_data.append((import_data(x), x))
+        all_data.append((import_data(x, repeats), x))
 
     # choose one or the other sample type if desired
     if samples is "random":
@@ -88,7 +88,6 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
                 print(f"\nCalculating abusive content percentage(s)...\n")
                 pct = percent_abusive(data)
                 print(pct)
-                # print(f"{pct[1]}% abusive (manual lexicon)") # debugging
                 export_df(pct, sample_type, i, path="output/stats/", prefix="percent")
 
             # report results + export
@@ -98,10 +97,10 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
             i += 1
 
 
-def import_data(sample_type):
+def import_data(sample_type, n):
     to_return = []
 
-    for i in range(1, 4):
+    for i in range(1, n+1):
         to_return.append(read_data(f"train.{sample_type}{i}.csv", verbose=False))
 
     return to_return
