@@ -40,7 +40,8 @@ This repository contains all of the resources you will need to replicate results
     - `python3 kaggle_train.py`
 
 5. Wait patiently for results
-    - Percentage calculation (see `calc_pct` above) is multithreaded for mild performance improvements.
+    - Percentage calculation (see `calc_pct` above) is time-consuming due to regex compilation and boosting step
+        - TODO: run in parallel (multithreaded)
     - **Rebuilt datasets** can be found in `data/`
     - **Class predictions** can be found in `output/pred/`
     - **Classification reports** can be found in `output/report/`
@@ -260,8 +261,7 @@ been trained or processed.
 This calculates how much of `data` is considered abusive. Uses all three lexicons: *manual*, *Wiegand Base*, and 
 *Wiegand Extended*. Returns a DataFrame with a column of lexicon names and calculated percentages.
 
-Utilizes the `multiprocessing` library for Python. The dataset is boosted on all three lexicons in parallel. Note that
-the *Wiegand Expanded* lexicon is extremely long and boosting on it takes a lot of time.
+TODO: Utilize the `multiprocessing` library for Python for parallel boosts. I got it to work but it hung up when joining jobs due to the Queue object.
 
 - Params
     - `data` (*df*): dataframe to calculate abusive contents of
@@ -270,7 +270,7 @@ the *Wiegand Expanded* lexicon is extremely long and boosting on it takes a lot 
 - Write
     - None
 
-#### `boost_multithreaded()`
+#### `boost_multithreaded()` (Deprecated)
 Calls `kaggle_preprocessing.boost_data()` and adds the result to a `multiprocessing.Queue` object. Returns both.
 - Params
     - `data` (*df*): dataframe to boost
