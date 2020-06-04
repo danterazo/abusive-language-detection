@@ -5,6 +5,7 @@
 from kaggle_preprocessing import read_data
 from kaggle_postprocessing import percent_abusive
 from kaggle_build import build_train as build_datasets
+from kaggle_build import export_lexicons as build_lexicons
 from kaggle_build import export_df
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import cross_val_predict
@@ -33,7 +34,10 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
     calc_pct (bool):    if TRUE, calculate percentage of abusive words in each sample
     """
 
-    build_datasets(samples, manual_boost, repeats, sample_size, verbose) if rebuild else None  # rebuild datasets
+    # rebuild datasets
+    if rebuild:
+        build_datasets(samples, manual_boost, repeats, sample_size, verbose)
+        build_lexicons()
 
     # struct example: [([random1, random2, ..., random_n], "random"), ...]
     all_data = []
