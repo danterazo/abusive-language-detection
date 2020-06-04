@@ -71,23 +71,32 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
             # Testing + results
             k = 5  # number of folds
 
-            filepath = os.path.join("output/pred/", f"pred.{sample_type.lower()}{i}.csv")
+            pred_path = os.path.join("output/pred/", f"pred.{sample_type.lower()}{i}.csv")
 
-            if path.exists(filepath):
+            if path.exists(pred_path):
                 print(f"Importing {sample_type}-sample SVM predictions...") if verbose else None
-                y_pred = pd.read_csv(filepath)  # import if `y_pred` has already been computed
+                y_pred = pd.read_csv(pred_path)  # import if `y_pred` has already been computed
                 print(f"Data imported!") if verbose else None
             else:
                 print(f"Fitting CountVectorizer & training {sample_type}-sample SVM...") if verbose else None
                 y_pred = cross_val_predict(clf, X, y, cv=k, n_jobs=14)  # else, compute
-                pd.DataFrame(y_pred).to_csv(filepath, index=False)  # save preds
+                pd.DataFrame(y_pred).to_csv(pred_path, index=False)  # save preds
                 print(f"SVM trained!") if verbose else None
 
             # calculate % abusive (multithreaded)
+            pct_path = os.path.join("output/stats/", f"percent.{sample_type.lower()}{i}.csv")
             if calc_pct:
-                print(f"\nCalculating abusive content percentage(s)...\n")
-                pct = percent_abusive(data)
-                print(pct)
+
+                if path.exists(pct_path):
+                    print(f"\nImporting {sample_type}-sample abusive content percentages...")
+                    pct = pd.read_csv(pct_path)  # import if already computed
+                    print(f"Percentages Imported!")
+                else:
+                    print(f"\nCalculating {sample_type}-sample abusive content percentages...")
+                    pct = percent_abusive(data)  # else, calculate
+                    print(f"Percentages calculated!")
+
+                print(f"{pct}")
                 export_df(pct, sample_type.lower(), i, path="output/stats/", prefix="percent", index=False)
 
             # report results + export
