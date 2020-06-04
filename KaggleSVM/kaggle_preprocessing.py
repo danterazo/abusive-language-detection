@@ -121,8 +121,11 @@ def boost_data(data, data_file, verbose=True, manual_boost=None):
     wordbank = list(dict.fromkeys(wordbank))  # remove dupes again cause once isn't enough for some reason
     wordbank_regex = re.compile("|".join(wordbank), re.IGNORECASE)  # compile regex. case insensitive
 
+    print("regex compiled")  # debugging, to remove
     # idea: .find() for count. useful for threshold
     filtered_data = data[data["comment_text"].str.contains(wordbank_regex)]
     print(f"Data filtered to size {filtered_data.shape[0]}.") if verbose else None
     print(f"Data boosted!\n") if verbose else None
+
+    print("data filtered")  # debugging, to remove
     return filtered_data

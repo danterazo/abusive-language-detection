@@ -5,16 +5,13 @@ from kaggle_preprocessing import boost_data
 from multiprocessing import Process, Queue
 import pandas as pd
 
+""" GLOBAL VARIABLES for MULTIPROCESSING"""
+boost_queue = Queue()
+
 
 # calculate % examples in given data that contains abusive words. returns df
 def percent_abusive(data):
-    """
-    data (df): dataframe to filter
-    lex (str): lexicon to filter with. Either "we" (wiegand extended) or "rds" (our manually tagged dataset)
-    """
-    jobs = []
-    to_return = []  # [[source (str), percent (float)], ...]
-    q = Queue()
+    results_df = pd.DataFrame(columns=["pct_abusive", "source_lexicon"])
 
     filenames = ["data/lexicon_manual/lexicon.manual.all.abusive.csv",
                  "data/lexicon_wiegand/lexicon.wiegand.base.abusive.csv",
@@ -25,29 +22,16 @@ def percent_abusive(data):
         source = f_split[1] + "." + f_split[2]
 
         boost_list = open(f).read().splitlines()
-        p = Process(target=boost_multithreaded, args=(data, source, boost_list, q,))
-        jobs.append(p)
-        p.start()
-
-    # multithreaded boosting; waits for all jobs to finish
-    for process in jobs:
-        process.join()
-
-    # get output
-    for x in jobs:
-        curr = q.get()
-        boosted_df, name = curr
+        boosted_df = boost_data(data, "", False, manual_boost=boost_list)
         pct = round(len(boosted_df) / len(data) * 100, 2)
 
-        to_return.append([pct, name])
+        results_df.loc[len(results_df)] = [pct, source]
 
-    # return dataframe
-    to_return = pd.DataFrame(to_return, columns=["percent_abusive", "source"])
-    return to_return
+    return results_df
 
 
 # multiprocess `boost_data()`
-def boost_multithreaded(data, source, manual_boost, queue):
+def boost_multithreaded(data, source, manual_boost, boost_queue):
     """
     - Params
         - data (df): dataframe to boost
@@ -60,5 +44,8 @@ def boost_multithreaded(data, source, manual_boost, queue):
 
     boosted_data = boost_data(data, "", False, manual_boost)
 
-    queue.put(boosted_data)
+    print(f"len boosted: {len(boosted_data)}")
+    # boost_queue.put((1, 1))
+    boost_queue.put(boosted_data)
+    print(f"added to queue: {boost_queue}")  # debugging, to remove
     return boosted_data, source

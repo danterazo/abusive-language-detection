@@ -88,7 +88,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
                 print(f"\nCalculating abusive content percentage(s)...\n")
                 pct = percent_abusive(data)
                 print(pct)
-                export_df(pct, sample_type, i, path="output/stats/", prefix="percent")
+                export_df(pct, sample_type.lower(), i, path="output/stats/", prefix="percent", index=False)
 
             # report results + export
             report = pd.DataFrame(classification_report(y, y_pred, output_dict=True)).transpose()
