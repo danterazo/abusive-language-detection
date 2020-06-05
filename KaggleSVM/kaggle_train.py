@@ -3,7 +3,7 @@
 # Dante Razo, drazo, 2020-05-15
 
 from kaggle_preprocessing import read_data
-from kaggle_postprocessing import percent_abusive
+from kaggle_postprocessing import percent_abusive, calc_oov
 from kaggle_build import build_train as build_datasets
 from kaggle_build import export_lexicons as build_lexicons
 from kaggle_build import export_df
@@ -21,7 +21,7 @@ run = 1  # convenient flag at top of file
 
 # TODO: multithreading? each sample -> thread (i.e. 9 running concurrently, 18 for filtering)
 # for each fold of each dataset of each sample type, train an SVM
-def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct):
+def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct, calc_oov):
     """
     rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
     samples ([str]):    three modes: "random", "boosted", or "all"
@@ -32,6 +32,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
     verbose (boolean):  toggles print statements
     sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
     calc_pct (bool):    if TRUE, calculate percentage of abusive words in each sample
+    calc_oov (bool):    if TRUE, calculate # of out-of-vocabulary (OOV) words in test fold
     """
 
     # rebuild datasets
@@ -71,8 +72,8 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
             # Testing + results
             k = 5  # number of folds
 
+            # calculate + export predictions
             pred_path = os.path.join("output/pred/", f"pred.{sample_type.lower()}{i}.csv")
-
             if path.exists(pred_path):
                 print(f"Importing {sample_type}-sample SVM predictions...") if verbose else None
                 y_pred = pd.read_csv(pred_path)  # import if `y_pred` has already been computed
@@ -83,20 +84,11 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
                 pd.DataFrame(y_pred).to_csv(pred_path, index=False)  # save preds
                 print(f"SVM trained!") if verbose else None
 
-            # calculate % abusive (multithreaded)
-            pct_path = os.path.join("output/stats/", f"percent.{sample_type.lower()}{i}.csv")
-            if calc_pct:
-                if path.exists(pct_path):
-                    print(f"\nImporting {sample_type}-sample abusive content percentages...")
-                    pct = pd.read_csv(pct_path)  # import if already computed
-                    print(f"Percentages Imported!")
-                else:
-                    print(f"\nCalculating {sample_type}-sample abusive content percentages...")
-                    pct = percent_abusive(data)  # else, calculate
-                    print(f"Percentages calculated!")
+            # calculate % abusive
+            pct_helper(data, sample_type, i) if calc_pct else None
 
-                print(f"{pct}")
-                export_df(pct, sample_type.lower(), i, path="output/stats/", prefix="percent", index=False)
+            # calculate out-of-vocabulary percentage for new folds NOT used for training
+            # oov_helper(data, sample_type, i) if calc_oov else None  # TODO: any way to get folds?
 
             # report results + export
             report = pd.DataFrame(classification_report(y, y_pred, output_dict=True)).transpose()
@@ -114,6 +106,36 @@ def import_data(sample_type, n):
     return to_return
 
 
+def pct_helper(data, sample_type, i):
+    pct_path = os.path.join("output/stats/percent_abusive", f"percent.{sample_type.lower()}{i}.csv")
+    if path.exists(pct_path):
+        print(f"\nImporting {sample_type}-sample abusive content percentages...")
+        pct = pd.read_csv(pct_path)  # import if already computed
+        print(f"Percentages Imported!")
+    else:
+        print(f"\nCalculating {sample_type}-sample abusive content percentages...")
+        pct = percent_abusive(data)  # else, calculate
+        print(f"Percentages calculated!")
+
+    print(f"{pct}")
+    export_df(pct, sample_type.lower(), i, path="output/stats/percent_abusive", prefix="percent", index=False)
+
+
+def oov_helper(data, sample_type, i):
+    oov_path = os.path.join("output/stats/oov", f"percent.{sample_type.lower()}{i}.csv")
+    if path.exists(oov_path):
+        print(f"\nImporting {sample_type}-sample OOV percentages...")
+        oov = pd.read_csv(oov_path)  # import if already computed
+        print(f"Percentages Imported!")
+    else:
+        print(f"\nCalculating {sample_type}-sample OOV percentages...")
+        oov = oov(data)  # else, calculate
+        print(f"Percentages calculated!")
+
+    print(f"{oov}")
+    export_df(oov, sample_type.lower(), i, path="output/stats/oov", prefix="oov", index=False)
+
+
 """ MAIN """
 # need main for multithreaded boosting
 if __name__ == '__main__':
@@ -126,6 +148,7 @@ if __name__ == '__main__':
         repeats = 3  # number of datasets per sample type
         verbose = True  # suppresses prints if FALSE
         calc_pct = True  # calculate abusive example percentage per sample
+        oov = True  # calculate out-of-vocabulary per fold
         sample_size = 20000
 
-        fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct)
+        fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct, oov)

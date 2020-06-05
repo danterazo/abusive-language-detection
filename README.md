@@ -37,7 +37,8 @@ This repository contains all of the resources you will need to replicate results
         | `sample_size`  | *int*        | **20000**     | {i &#124; i &isin; Z<sup>+</sup>, i > 0}             | Set the size of each dataset when building. If any set has <2000 examples, the others will be trimmed to match it. Ignored if `rebuild` is **False**. |
         | `verbose`      | *bool*       | **True**      | True, False                                          | Controls verbose print statements. Passed to other functions like a react prop. |
         | `calc_pct`     | *bool*       | **True**      | True, False                                          | If **True**, calculate the percentage of abusive words in each sample. Uses *manual*, *Wiegand Base*, and *Wiegand Extended* lexicons. Very computationally expensive. |
-
+    | `calc_oov` | *bool* | **True** | True, False | If **True**, calculate the number of out-of-vocabulary (OOV) words in each `test` fold |
+    
 4. Train
     - Once you've configured the script, simply run `kaggle_train.py`. No user input is required.
     - `python3 kaggle_train.py`
@@ -193,7 +194,7 @@ Reads given DataFrame line-by-line. Some comments have tabs or commas, and that 
 file delimiter. Removes entries with missing values (there's only 1 in `train.target+comments.tsv` without a score)
 - Params
     - `dataset` (*str*): filename of dataset to import
-    - `verbose` (*verbose*): toggles print statements; default True
+    - `verbose` (*verbose*): toggles print statements; default **TRUE**
 - Return
     - Clean delimited data: (*df*)
 - Write
@@ -215,7 +216,7 @@ of those words instead.
 - Params
     - `data` (*df*): dataframe to boost
     - `data_file` (*str*): filename for print statements; ignored if `verbose=FALSE`
-    - `verbose` (*bool*): controls verbosity; default *TRUE*
+    - `verbose` (*bool*): controls verbosity; default **TRUE**
     - `manual_boost` (*[str]*, or *None*): user-defined wordbank to boost on; default *None*
 - Return
     - Boosted data: (*df*)
@@ -234,10 +235,11 @@ This is where the magic happens. Fits CountVectorizer, trains SVM, and prints + 
     - `analyzer` (*str*): either "word" or "char". for CountVectorizer
     - `ngram_range` (*(int,int)*): tuple containing lower and upper ngram bounds for CountVectorizer
     - `manual_boost` (*[str]*): use given array of strings for filtering instead of built-in wordbanks. Or pass `None`
-    - `repeats` (*int*): controls the number of datasets built per sample type (if `rebuild` is TRUE)
+    - `repeats` (*int*): controls the number of datasets built per sample type (if `rebuild` is **TRUE**)
     - `verbose` (*boolean*): toggles print statements
     - `sample_size` (*int*): size of sampled datasets. If set too high, the smaller size will be used
-    - `calc_pct` (*bool*): if TRUE, calculate percentage of abusive words in each sample
+    - `calc_pct` (*bool*): if **TRUE**, calculate percentage of abusive words in each sample
+    - `calc_oov` (*bool*): if **TRUE**, calculate number of out-of-vocabulary words in each test fold
 - Return
     - None
 - Write
