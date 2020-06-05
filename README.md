@@ -8,6 +8,9 @@ See `Paper/` for uncompiled LaTeX and assets. The final paper will be in the roo
 
 The plan is to submit this paper to the [_Fourth Workshop on Online Abuse and Harms_](https://www.aclweb.org/portal/content/fourth-workshop-online-abuse-and-harms) (WOAH), co-located with the 2020 conference on _Empirical Methods in Natural Language Processing_ (EMNLP 2020).
 
+## Results
+Work in progress. Stay tuned!
+
 # Code
 This repository contains all of the resources you will need to replicate results. Boosting data takes an absurd amount of time depending on the lexicon used; I recommend using a computer with at least **4c/4t** and **16GB** of memory. Again, this is a recommendation and not a requirement.
 
