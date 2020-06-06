@@ -1,13 +1,12 @@
 # LING-X 490
 # This file takes built data and reformats / averages / analyzes it
 # Dante Razo, drazo
-import os.path
-import re
-from os import path
-
 import pandas as pd
 from kaggle_preprocessing import boost_data, read_data
 from sklearn.model_selection import KFold
+import re
+from os import path
+
 
 decimals = 2  # global variable for output
 
@@ -49,7 +48,7 @@ def calc_oov(k, verbose):
 
     for s in sample_types:
         for i in range(1, per_sample + 1):
-            oov_path = os.path.join("output/stats/oov", f"oov.{s.lower()}{i}.csv")
+            oov_path = path.join("output/stats/oov", f"oov.{s.lower()}{i}.csv")
             filename = f"train.{s}{i}.csv"
 
             if path.exists(oov_path):  # check if results file already exists

@@ -1,8 +1,6 @@
 # LING-X 490: Abusive Language Detection
 # This file trains SVMs on uniquely-sampled datasets
 # Dante Razo, drazo, 2020-05-15
-import os.path
-from os import path
 
 import pandas as pd
 from kaggle_build import build_train as build_datasets
@@ -15,6 +13,7 @@ from sklearn.metrics import classification_report
 from sklearn.model_selection import cross_val_predict
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
+from os import path
 
 run = 1  # convenient flag at top of file
 
@@ -96,7 +95,7 @@ def import_data(sample_type, n):
 def pred_helper(x, y, clf, k, sample_type, i):
     X = x  # as it should be
 
-    pred_path = os.path.join("output/pred/", f"pred.{sample_type.lower()}{i}.csv")
+    pred_path = path.join("output/pred/", f"pred.{sample_type.lower()}{i}.csv")
     if path.exists(pred_path):
         print(f"Importing {sample_type}-sample SVM predictions...") if verbose else None
         y_pred = pd.read_csv(pred_path)  # import if `y_pred` has already been computed
@@ -111,7 +110,7 @@ def pred_helper(x, y, clf, k, sample_type, i):
 
 
 def pct_helper(data, sample_type, i):
-    pct_path = os.path.join("output/stats/percent_abusive", f"percent.{sample_type.lower()}{i}.csv")
+    pct_path = path.join("output/stats/percent_abusive", f"percent.{sample_type.lower()}{i}.csv")
     if path.exists(pct_path):
         print(f"\nImporting {sample_type}-sample abusive content percentages...")
         pct = pd.read_csv(pct_path)  # import if already computed
