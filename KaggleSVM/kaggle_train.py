@@ -1,19 +1,19 @@
 # LING-X 490: Abusive Language Detection
 # This file trains SVMs on uniquely-sampled datasets
 # Dante Razo, drazo, 2020-05-15
+from os import path
 
-import pandas as pd
-from kaggle_build import build_train as build_datasets
-from kaggle_build import export_df
-from kaggle_build import export_lexicons as build_lexicons
-from kaggle_postprocessing import percent_abusive
+from kaggle_postprocessing import calc_pct_abusive
 from kaggle_preprocessing import read_data
+from kaggle_build import build_train as build_datasets
+from kaggle_build import export_lexicons as build_lexicons
+from kaggle_build import export_df
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.metrics import classification_report
 from sklearn.model_selection import cross_val_predict
+from sklearn.metrics import classification_report
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
-from os import path
+import pandas as pd
 
 run = 1  # convenient flag at top of file
 
@@ -117,7 +117,7 @@ def pct_helper(data, sample_type, i):
         print(f"Percentages Imported!")
     else:
         print(f"\nCalculating {sample_type}-sample abusive content percentages...")
-        pct = percent_abusive(data)  # else, calculate
+        pct = calc_pct_abusive(data)  # else, calculate
         print(f"Percentages calculated!")
 
     print(f"{pct}")
