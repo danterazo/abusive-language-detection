@@ -2,8 +2,10 @@
 # This file takes built data and reformats / averages / analyzes it
 # Dante Razo, drazo
 from kaggle_preprocessing import boost_data, read_data
+from kaggle_build import export_df
 from sklearn.model_selection import KFold
 import pandas as pd
+import re
 
 
 # calculate % examples in given data that contains abusive words. returns df
@@ -32,6 +34,7 @@ def percent_abusive(data):
 # oov: out-of-vocabulary
 def calc_oov(k):
     manual_lexicon = open("data/lexicon_manual/lexicon.manual.all.abusive.csv").read().splitlines()  # read as list
+    return_list = []
 
     # unfortunately all the data is in one folder, so I need to manually pick out the relevant sets here
     per_sample = 3
@@ -53,14 +56,18 @@ def calc_oov(k):
                 # filter on vocab_used
                 test_filtered = boost_data(train, "", False, manual_boost=vocab_used)
 
-                # TODO: calc percent + return
-                # TODO: export
+                pct = round(len(test_filtered) / len(data) * 100, 2)
+                return_list.append([pct, filename])
 
-                print(test_filtered)
+                # TODO: export per sample?
+
+            print(return_list)
 
     # calculate results
 
-    pass
+    return_df = pd.DataFrame(return_list, columns=["pct_abusive", "sample"])
+    print(f"\nreturn_df: {return_df}")
+    return return_df
 
 
 # manually create test/train splits
@@ -80,36 +87,38 @@ def manual_kfold(data, k):
     return to_return
 
 
-# given df (train or test), return list of words
-def get_words_list(data):
+# given df (train or test), return set of words
+def get_words_set(data):
     comments = data["comment_text"].tolist()
-    words = []
+    all_words = set()  # init
+    regex = re.compile("[^A-Za-z0-9]+", re.IGNORECASE)
 
     # get all words in test set
     for x in comments:
-        words = x.split()
+        comment_words = set(x.split())
 
-        for w in words:
-            words.append(w)
+        for w in comment_words:
+            w_re = re.sub(regex, '', w)  # filter special characters to reduce set size
+            all_words.add(w_re.lower())
 
-    words = list(set(words))  # remove dupes
-    return words
+    # TODO: verify that this works correctly
+    return all_words
 
 
 # intersect + 2x complements b/w test words and lexicon
 def set_ops(test, lex):
     lex = set(lex)
 
-    test_words = get_words_list(test)
+    test_words = get_words_set(test)
 
     # words in both test and lexicon (intersect)
-    vocab_used = set(test_words) & set(lex)
+    vocab_used = test_words & lex
 
     # words in lexicon but not test (not OOV)
-    vocab_unused = lex.difference(vocab_used)
+    vocab_unused = lex - test_words
 
     # words in test but not lexicon (out-of-vocabulary, OOV)
-    oov = vocab_used.difference(lex)
+    oov = test_words - lex
 
     return vocab_used, vocab_unused, oov
 
