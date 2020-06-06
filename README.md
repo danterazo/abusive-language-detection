@@ -37,7 +37,6 @@ This repository contains all of the resources you will need to replicate results
         | `sample_size`  | *int*        | **20000**     | {i &#124; i &isin; Z<sup>+</sup>, i > 0}             | Set the size of each dataset when building. If any set has <2000 examples, the others will be trimmed to match it. Ignored if `rebuild` is **False**. |
         | `verbose`      | *bool*       | **True**      | True, False                                          | Controls verbose print statements. Passed to other functions like a react prop. |
         | `calc_pct`     | *bool*       | **True**      | True, False                                          | If **True**, calculate the percentage of abusive words in each sample. Uses *manual*, *Wiegand Base*, and *Wiegand Extended* lexicons. Very computationally expensive. |
-    | `calc_oov` | *bool* | **True** | True, False | If **True**, calculate the number of out-of-vocabulary (OOV) words in each `test` fold |
     
 4. Train
     - Once you've configured the script, simply run `kaggle_train.py`. No user input is required.
@@ -239,7 +238,6 @@ This is where the magic happens. Fits CountVectorizer, trains SVM, and prints + 
     - `verbose` (*boolean*): toggles print statements
     - `sample_size` (*int*): size of sampled datasets. If set too high, the smaller size will be used
     - `calc_pct` (*bool*): if **TRUE**, calculate percentage of abusive words in each sample
-    - `calc_oov` (*bool*): if **TRUE**, calculate number of out-of-vocabulary words in each test fold
 - Return
     - None
 - Write
