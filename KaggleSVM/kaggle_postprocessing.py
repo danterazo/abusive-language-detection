@@ -2,7 +2,6 @@
 # This file takes built data and reformats / averages / analyzes it
 # Dante Razo, drazo
 from kaggle_preprocessing import boost_data, read_data
-from kaggle_build import export_df
 from sklearn.model_selection import KFold
 import pandas as pd
 from os import path
@@ -118,8 +117,8 @@ def get_usage_sets(df, lex):
 
 
 # given df (train or test), return set of words
-def get_words_set(data):
-    comments = data["comment_text"].tolist()
+def get_words_set(df):
+    comments = df["comment_text"].tolist()
     all_words = set()  # init
     regex = re.compile("[^A-Za-z0-9]+", re.IGNORECASE)
 
@@ -131,7 +130,6 @@ def get_words_set(data):
             w_re = re.sub(regex, '', w)  # filter special characters to reduce set size
             all_words.add(w_re.lower())
 
-    # TODO: verify that this works correctly
     return all_words
 
 
