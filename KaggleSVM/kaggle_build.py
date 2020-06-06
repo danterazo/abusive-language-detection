@@ -10,7 +10,7 @@ import glob
 
 # only import once
 def get_train():
-    dataset = "train.target+comments.tsv"  # 'test' for classification problem
+    dataset = "src/train.target+comments.tsv"  # 'test' for classification problem
     return read_data(dataset)
 
 
@@ -25,7 +25,7 @@ def build_random(data, sample_size, repeats=3):
 
 
 def build_boosted(data, manual_boost, sample_size, repeats=3):
-    data_file = "train.target+comments.tsv"  # name for verbose prints
+    data_file = "src/train.target+comments.tsv"  # name for verbose prints
     to_export = []
 
     # sample + export, topic

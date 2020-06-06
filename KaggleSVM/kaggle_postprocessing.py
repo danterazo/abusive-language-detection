@@ -47,16 +47,16 @@ def calc_oov(k):
                 train = f[0]
                 test = f[1]
 
-                # take intersection
-                oov, non_oov = test_lexicon_intersect(test, manual_lexicon)
+                # set operations
+                vocab_used, vocab_unused, oov = set_ops(test, manual_lexicon)
 
-                # filter on noov
-                test_filtered = boost_data(data, "", False, manual_boost=manual_lexicon)
-                train_filtered = boost_data(data, "", False, manual_boost=manual_lexicon)
+                # filter on vocab_used
+                test_filtered = boost_data(train, "", False, manual_boost=vocab_used)
+
+                # TODO: calc percent + return
+                # TODO: export
 
                 print(test_filtered)
-
-    # filter
 
     # calculate results
 
@@ -80,33 +80,38 @@ def manual_kfold(data, k):
     return to_return
 
 
-# get list of words in `test` and intersect with list of words in lexicon
-def test_lexicon_intersect(test, lex):
-    lex = set(lex)
-    test_comments = test["comment_text"].tolist()
-    test_words = []
-    unused_words = []
-    intersect_words = []
+# given df (train or test), return list of words
+def get_words_list(data):
+    comments = data["comment_text"].tolist()
+    words = []
 
     # get all words in test set
-    for x in test_comments:
+    for x in comments:
         words = x.split()
 
         for w in words:
-            test_words.append(w)
+            words.append(w)
 
-    test_words = list(set(test_words))  # remove dupes
+    words = list(set(words))  # remove dupes
+    return words
 
-    # intersect / words in vocabulary
-    intersect_words = set(test_words) & set(lex)
 
-    # subtract intersect from lexicon to find OOV words
-    unused_words = lex.difference(intersect_words)
+# intersect + 2x complements b/w test words and lexicon
+def set_ops(test, lex):
+    lex = set(lex)
 
-    print(len(intersect_words))
-    print(len(unused_words)) # TODO: left off here
+    test_words = get_words_list(test)
 
-    return unused_words, intersect_words
+    # words in both test and lexicon (intersect)
+    vocab_used = set(test_words) & set(lex)
+
+    # words in lexicon but not test (not OOV)
+    vocab_unused = lex.difference(vocab_used)
+
+    # words in test but not lexicon (out-of-vocabulary, OOV)
+    oov = vocab_used.difference(lex)
+
+    return vocab_used, vocab_unused, oov
 
 
 if __name__ == '__main__':
