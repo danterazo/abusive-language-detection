@@ -59,23 +59,20 @@ def calc_oov(k, verbose):
                 print(f"OOV already computed for {filename}. Skipping...")  # TODO: are we really calculating OOV?
             else:
                 data = read_data(filename, verbose)
-                return_list = []
-
                 folds = manual_kfold(data, k, state)
+                return_list = []
                 curr_fold_num = 0
 
                 for f in folds:
-                    curr_fold_num += 1
                     curr_fold_name = f"{filename}:fold{curr_fold_num}"
-                    train = f[0]
-                    test = f[1]
-                    train_len = len(train)
+                    curr_fold_num += 1
+                    train, test = f
 
                     print(f"Computing metrics for {curr_fold_name}...") if verbose else None
-                    train_metrics = lexicon_usage_metrics(train, lexicon, curr_fold_name, train_len)
+                    train_metrics = lexicon_usage_metrics(train, lexicon, curr_fold_name, len(train))
                     train_pct_used, train_pct_unused, train_num_used, train_num_unused, train_used = train_metrics
 
-                    test_metrics = lexicon_usage_metrics(test, lexicon, curr_fold_name, train_len)
+                    test_metrics = lexicon_usage_metrics(test, lexicon, curr_fold_name, len(train))
                     test_pct_used, test_pct_unused, test_num_used, test_num_unused, test_used = test_metrics
 
                     # ratio: # of words in both train and test divided by # of words in test
