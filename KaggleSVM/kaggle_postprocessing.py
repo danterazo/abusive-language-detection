@@ -134,5 +134,4 @@ def get_words_set(df):
 if __name__ == '__main__':
     decimals = 2  # global variable for output
 
-    perce
     calc_oov(k=5, verbose=True)
