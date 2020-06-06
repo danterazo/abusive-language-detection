@@ -1,19 +1,20 @@
 # LING-X 490: Abusive Language Detection
 # This file trains SVMs on uniquely-sampled datasets
 # Dante Razo, drazo, 2020-05-15
-from kaggle_preprocessing import read_data
-from kaggle_postprocessing import percent_abusive
+import os.path
+from os import path
+
+import pandas as pd
 from kaggle_build import build_train as build_datasets
-from kaggle_build import export_lexicons as build_lexicons
 from kaggle_build import export_df
+from kaggle_build import export_lexicons as build_lexicons
+from kaggle_postprocessing import percent_abusive
+from kaggle_preprocessing import read_data
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import classification_report
+from sklearn.model_selection import cross_val_predict
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
-import pandas as pd
-from os import path
-import os.path
 
 run = 1  # convenient flag at top of file
 
@@ -26,7 +27,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
     samples ([str]):    three modes: "random", "boosted", or "all"
     analyzer (str):     either "word" or "char". for CountVectorizer
     ngram_range ((int,int)):   tuple containing lower and upper ngram bounds for CountVectorizer
-    manual_boost ([str]):   use given array of strings for filtering instead of built-in wordbanks. Or pass `None`
+    manual_boost ([str]):   use given list of strings for filtering instead of built-in wordbanks. Or pass `None`
     repeats (int):      controls the number of datasets built per sample type (if `rebuild` is TRUE)
     verbose (boolean):  toggles print statements
     sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
@@ -131,7 +132,7 @@ if __name__ == '__main__':
         samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
         analyzer = "word"  # "char" or "word"
         ngram_range = (1, 3,)  # int 2-tuple (couple)
-        manual_boost = ["trump"]  # ["trump"]  # None, or an array of strings
+        manual_boost = ["trump"]  # ["trump"]  # None, or a list of strings
         rebuild = False  # rebuild datasets + export
         repeats = 3  # number of datasets per sample type
         verbose = True  # suppresses prints if FALSE

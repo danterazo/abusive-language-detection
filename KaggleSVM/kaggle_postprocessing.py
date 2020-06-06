@@ -1,12 +1,13 @@
 # LING-X 490
 # This file takes built data and reformats / averages / analyzes it
 # Dante Razo, drazo
-from kaggle_preprocessing import boost_data, read_data
-from sklearn.model_selection import KFold
-import pandas as pd
-from os import path
 import os.path
 import re
+from os import path
+
+import pandas as pd
+from kaggle_preprocessing import boost_data, read_data
+from sklearn.model_selection import KFold
 
 decimals = 2  # global variable for output
 

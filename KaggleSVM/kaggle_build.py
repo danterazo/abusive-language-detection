@@ -1,11 +1,12 @@
 # LING-X 490
 # This file builds, imports, and exports data
 # Dante Razo, drazo
-from kaggle_preprocessing import read_data, boost_data, sample_data
-import pandas as pd
-import numpy as np
-import os
 import glob
+import os
+
+import numpy as np
+import pandas as pd
+from kaggle_preprocessing import read_data, boost_data, sample_data
 
 
 # only import once

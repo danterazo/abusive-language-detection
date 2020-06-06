@@ -1,8 +1,9 @@
 # LING-X 490
 # This file imports, formats, and processes data for use in SVM
 # Dante Razo, drazo
-import pandas as pd
 import re
+
+import pandas as pd
 
 
 # read + process training data
