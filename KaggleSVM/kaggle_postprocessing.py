@@ -1,18 +1,16 @@
 # LING-X 490
 # This file takes built data and reformats / averages / analyzes it
 # Dante Razo, drazo
-import pandas as pd
+from os import path
+import re
+
 from kaggle_preprocessing import boost_data, read_data
 from sklearn.model_selection import KFold
-import re
-from os import path
-
-
-decimals = 2  # global variable for output
+import pandas as pd
 
 
 # calculate % examples in given data that contains abusive words. returns df
-def percent_abusive(data, verbose):
+def calc_pct_abusive(data, verbose):
     results_df = pd.DataFrame(columns=["pct_abusive", "source_lexicon"])
 
     lexicon_filenames = ["data/lexicon_manual/lexicon.manual.all.abusive.csv",
@@ -134,4 +132,7 @@ def get_words_set(df):
 
 
 if __name__ == '__main__':
+    decimals = 2  # global variable for output
+
+    perce
     calc_oov(k=5, verbose=True)

@@ -259,7 +259,7 @@ Helper function that queues datasets to be trained *per sample*. It reads `n` se
 ## kaggle_postprocessing.py
 If postprocessing wasn't already a word, it is now. This contains helper functions that work with data that has already been trained or processed.
 
-### `percent_abusive()`
+### `calc_pct_abusive()`
 This computes how much of `data` is considered abusive. Uses all three lexicons: *manual*, *Wiegand Base*, and 
 *Wiegand Extended*. Returns a DataFrame with a column of lexicon names and calculated percentages.
 - Params
