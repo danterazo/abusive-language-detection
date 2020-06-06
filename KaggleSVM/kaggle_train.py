@@ -18,7 +18,6 @@ import pandas as pd
 run = 1  # convenient flag at top of file
 
 
-# TODO: multithreading? each sample -> thread (i.e. 9 running concurrently, 18 for filtering)
 # for each fold of each dataset of each sample type, train an SVM
 def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct):
     """
