@@ -124,8 +124,10 @@ def pct_helper(data, sample_type, i):
 
 
 """ MAIN """
-# need main for multithreaded boosting
-if __name__ == '__main__':
+
+
+# separate main to protect variable names in inner scope
+def main():
     if run is 1:
         samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
         analyzer = "word"  # "char" or "word"
@@ -138,3 +140,8 @@ if __name__ == '__main__':
         sample_size = 20000
 
         fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct)
+
+
+# need main for future multithreaded function calls
+if __name__ == '__main__':
+    main()
