@@ -9,10 +9,12 @@ from os import path
 import os.path
 import re
 
+decimals = 2  # global variable for output
+
 
 # calculate % examples in given data that contains abusive words. returns df
 # TODO: multiprocessing library
-def percent_abusive(data):
+def percent_abusive(data, verbose):
     results_df = pd.DataFrame(columns=["pct_abusive", "source_lexicon"])
 
     lexicon_filenames = ["data/lexicon_manual/lexicon.manual.all.abusive.csv",
@@ -21,25 +23,27 @@ def percent_abusive(data):
 
     # NOTE: tried multithreading, but performance improvement was negligible (~10s) and it wasn't reliable
     for f in lexicon_filenames:
+        print(f"Computing % abusive for {f}...") if verbose else None
         f_split = f.split(".", 3)
         source = f_split[1] + "." + f_split[2]  # get source name from filename
 
         boost_list = open(f).read().splitlines()  # read file as list
         boosted_df = boost_data(data, "", False, manual_boost=boost_list)
-        pct = round(len(boosted_df) / len(data) * 100, 2)
+        pct = round(len(boosted_df) / len(data) * 100, decimals)
 
         results_df.loc[len(results_df)] = [pct, source]
+        print(f"Computed.\n") if verbose else None
 
     return results_df
 
 
 # return percent of words that occur in `test` but NOT `train` splits
 # oov: out-of-vocabulary
-def calc_word_metrics(k, verbose):
+def calc_oov(k, verbose):
     lexicon = open("data/lexicon_manual/lexicon.manual.all.abusive.csv").read().splitlines()  # read as list
     df_columns = ["fold", "train_pct_used", "train_pct_unused", "train_num_used", "train_num_unused",
                   "test_pct_used", "test_pct_unused", "test_num_used", "test_num_unused", "used_ratio",
-                  "unused_ratio"]
+                  "unused_ratio", "only_in_train", "only_in_test"]
 
     # unfortunately all the data is in one folder, so I need to manually pick out the relevant sets here
     sample_types = ["random", "topic", "wordbank"]
@@ -67,22 +71,30 @@ def calc_word_metrics(k, verbose):
                     test = f[1]
                     train_len = len(train)
 
-                    train_metrics = lexicon_usage_metrics(train, lexicon, curr_fold_name, train_len, verbose)
-                    train_pct_used, train_pct_unused, train_num_used, train_num_unused = train_metrics
+                    print(f"Computing metrics for {curr_fold_name}...") if verbose else None
+                    train_metrics = lexicon_usage_metrics(train, lexicon, curr_fold_name, train_len)
+                    train_pct_used, train_pct_unused, train_num_used, train_num_unused, train_used = train_metrics
 
-                    test_metrics = lexicon_usage_metrics(test, lexicon, curr_fold_name, train_len, verbose)
-                    test_pct_used, test_pct_unused, test_num_used, test_num_unused = test_metrics
+                    test_metrics = lexicon_usage_metrics(test, lexicon, curr_fold_name, train_len)
+                    test_pct_used, test_pct_unused, test_num_used, test_num_unused, test_used = test_metrics
+
+                    # ratio: # of words in both train and test divided by # of words in test
+                    only_in_train = round(len(train_used & test_used) / len(test_used) * 100, decimals)
+                    only_in_test = round(100 - only_in_train, decimals)
 
                     # ratio of used words between train and test. if 1, then equal
                     used_ratio = train_pct_used / test_pct_used
                     unused_ratio = train_pct_unused / test_pct_unused
 
-                    row = [curr_fold_num] + train_metrics + test_metrics + [used_ratio, unused_ratio]
+                    row = [curr_fold_num] + train_metrics[0:4] + test_metrics[0:4] + [used_ratio, unused_ratio,
+                                                                                      only_in_train, only_in_test]
+                    row = [round(x, decimals) for x in row]
                     return_list.append(row)
 
                 # export per sample
                 return_df = pd.DataFrame(return_list, columns=df_columns)
                 return_df.to_csv(oov_path, index=False)  # save results to csv
+                print(f"OOV metrics computed.\n") if verbose else None
 
 
 """ Metrics-DF Helper Functions """
@@ -145,28 +157,31 @@ def set_ops(df, lex):
 
 
 # return %s for main metrics function
-def lexicon_usage_metrics(df, lexicon, curr_fold_name, source_len, verbose):
+def lexicon_usage_metrics(df, lexicon, curr_fold_name, source_len):
     # set operations
     used, unused, train_oov = set_ops(df, lexicon)
 
     # TODO: multithreading
     # filter on vocab_used
-    used = boost_data(df, curr_fold_name, verbose, manual_boost=used)
+    used = boost_data(df, curr_fold_name, False, manual_boost=used)
     num_used = len(used)
-    pct_used = round(len(used) / source_len * 100, 2)
+    pct_used = round(len(used) / source_len * 100, decimals)
 
     # filter on vocab_unused
-    unused = boost_data(df, curr_fold_name, verbose, manual_boost=unused)
+    unused = boost_data(df, curr_fold_name, False, manual_boost=unused)
     num_unused = len(unused)
-    pct_unused = round(len(unused) / source_len * 100, 2)
+    pct_unused = round(len(unused) / source_len * 100, decimals)
 
     # filter on OOV
     # TODO: debug
     # train_oov = boost_data(train, curr_fold_name, verbose, manual_boost=test_oov)
-    # pct_oov = round(len(train_oov) / train_len * 100, 2)
+    # pct_oov = round(len(train_oov) / train_len * 100, decimals)
 
-    return [pct_used, pct_unused, num_used, num_unused]
+    # TODO: refactor all this
+
+    used_set = get_words_set(used)
+    return [pct_used, pct_unused, num_used, num_unused, used_set]
 
 
 if __name__ == '__main__':
-    calc_word_metrics(k=5, verbose=True)
+    calc_oov(k=5, verbose=True)
