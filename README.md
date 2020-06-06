@@ -214,7 +214,7 @@ Given data, return only rows containing predefined abusive words. Or, if given a
 of those words instead.
 - Params
     - `data` (*df*): dataframe to boost
-    - `data_file` (*str*): filename for print statements; ignored if `verbose=FALSE`
+    - `data_name` (*str*): filename for print statements; ignored if `verbose=FALSE`
     - `verbose` (*bool*): controls verbosity; default **TRUE**
     - `manual_boost` (*[str]*, or *None*): user-defined wordbank to boost on; default *None*
 - Return

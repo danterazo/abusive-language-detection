@@ -48,19 +48,18 @@ def sample_data(data, size):
     return data.sample(frac=1)[0:size]
 
 
-# boosts data, i.e. returns data that contains any word in given Wordbank
-def boost_data(data, data_file, verbose=True, manual_boost=None):
+# boosts data, i.e. returns data that contains any word in given wordbank
+def boost_data(data, data_name, verbose=True, manual_boost=None):
     """
     data (df):          dataset to filter
     topics ([str]]):    word(s) to filter with. this wordbank bypasses the banks below
     """
     if verbose:
-        print(f"Boosting data...") if verbose else None
-
-        if not manual_boost.empty:
-            print(f"Filtering `{data_file}` on {manual_boost}...")
+        manual_boost_len = len(manual_boost)
+        if manual_boost_len > 0:
+            print(f"Boosting `{data_name}` on custom wordbank of size {manual_boost_len}...")
         else:
-            print(f"Filtering `{data_file}` on wordbank...")
+            print(f"Boosting `{data_name}` on built-in wordbank...")
 
     # source (built upon): https://dictionary.cambridge.org/us/topics/religion/islam/d
     islam_wordbank = ["allah", "caliphate", "fatwa", "hadj", "hajj", "halal", "headscarf", "hegira", "hejira",
@@ -123,6 +122,5 @@ def boost_data(data, data_file, verbose=True, manual_boost=None):
 
     # idea: .find() for count. useful for threshold
     filtered_data = data[data["comment_text"].str.contains(wordbank_regex)]
-    print(f"Data filtered to size {filtered_data.shape[0]}.") if verbose else None
-    print(f"Data boosted!\n") if verbose else None
+    print(f"Data boosted to size {filtered_data.shape[0]}.\n") if verbose else None
     return filtered_data

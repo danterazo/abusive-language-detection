@@ -93,7 +93,9 @@ def import_data(sample_type, n):
     return to_return
 
 
-def pred_helper(X, y, clf, k, sample_type, i):
+def pred_helper(x, y, clf, k, sample_type, i):
+    X = x  # as it should be
+
     pred_path = os.path.join("output/pred/", f"pred.{sample_type.lower()}{i}.csv")
     if path.exists(pred_path):
         print(f"Importing {sample_type}-sample SVM predictions...") if verbose else None
