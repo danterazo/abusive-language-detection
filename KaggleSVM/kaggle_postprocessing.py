@@ -35,8 +35,11 @@ def percent_abusive(data):
 
 # return percent of words that occur in `test` but NOT `train` splits
 # oov: out-of-vocabulary
-def calc_oov(k, verbose):
+def calc_word_metrics(k, verbose):
     lexicon = open("data/lexicon_manual/lexicon.manual.all.abusive.csv").read().splitlines()  # read as list
+    df_columns = ["fold", "train_pct_used", "train_pct_unused", "train_num_used", "train_num_unused",
+                  "test_pct_used", "test_pct_unused", "test_num_used", "test_num_unused", "used_ratio",
+                  "unused_ratio"]
 
     # unfortunately all the data is in one folder, so I need to manually pick out the relevant sets here
     sample_types = ["random", "topic", "wordbank"]
@@ -49,9 +52,7 @@ def calc_oov(k, verbose):
             filename = f"train.{s}{i}.csv"
 
             if path.exists(oov_path):  # check if results file already exists
-                # TODO: uncomment when done tweaking code
-                # print(f"OOV already computed for {filename}. Skipping...")
-                pass
+                print(f"OOV already computed for {filename}. Skipping...")  # TODO: are we really calculating OOV?
             else:
                 data = read_data(filename, verbose)
                 return_list = []
@@ -66,36 +67,25 @@ def calc_oov(k, verbose):
                     test = f[1]
                     train_len = len(train)
 
-                    train_metrics = oov_metrics(train, lexicon, curr_fold_name, train_len, verbose)
+                    train_metrics = lexicon_usage_metrics(train, lexicon, curr_fold_name, train_len, verbose)
                     train_pct_used, train_pct_unused, train_num_used, train_num_unused = train_metrics
 
-                    test_metrics = oov_metrics(test, lexicon, curr_fold_name, train_len, verbose)
+                    test_metrics = lexicon_usage_metrics(test, lexicon, curr_fold_name, train_len, verbose)
                     test_pct_used, test_pct_unused, test_num_used, test_num_unused = test_metrics
-
-                    # filter on OOV
-                    # TODO: debug
-                    # train_oov = boost_data(train, curr_fold_name, verbose, manual_boost=test_oov)
-                    # pct_oov = round(len(train_oov) / train_len * 100, 2)
 
                     # ratio of used words between train and test. if 1, then equal
                     used_ratio = train_pct_used / test_pct_used
                     unused_ratio = train_pct_unused / test_pct_unused
 
                     row = [curr_fold_num] + train_metrics + test_metrics + [used_ratio, unused_ratio]
-                    print(f"row: {row}")  # debugging
                     return_list.append(row)
 
                 # export per sample
-                columns = ["fold", "train_pct_used", "train_pct_unused", "train_num_used", "train_num_unused",
-                           "test_pct_used", "test_pct_unused", "test_num_used", "test_num_unused", "used_ratio",
-                           "unused_ratio"]
-                print(f"final: {return_list}")  # debugging
-                print(f"final len: {len(return_list)}, len[0]: {len(return_list[0])}")
-                return_df = pd.DataFrame(return_list, columns=columns)
+                return_df = pd.DataFrame(return_list, columns=df_columns)
                 return_df.to_csv(oov_path, index=False)  # save results to csv
 
 
-""" OOV Helper Functions """
+""" Metrics-DF Helper Functions """
 
 
 # manually create test/train splits
@@ -154,8 +144,8 @@ def set_ops(df, lex):
     return vocab_used, vocab_unused, oov
 
 
-# return %s for main oov function
-def oov_metrics(df, lexicon, curr_fold_name, source_len, verbose):
+# return %s for main metrics function
+def lexicon_usage_metrics(df, lexicon, curr_fold_name, source_len, verbose):
     # set operations
     used, unused, train_oov = set_ops(df, lexicon)
 
@@ -170,8 +160,13 @@ def oov_metrics(df, lexicon, curr_fold_name, source_len, verbose):
     num_unused = len(unused)
     pct_unused = round(len(unused) / source_len * 100, 2)
 
+    # filter on OOV
+    # TODO: debug
+    # train_oov = boost_data(train, curr_fold_name, verbose, manual_boost=test_oov)
+    # pct_oov = round(len(train_oov) / train_len * 100, 2)
+
     return [pct_used, pct_unused, num_used, num_unused]
 
 
 if __name__ == '__main__':
-    calc_oov(k=5, verbose=True)
+    calc_word_metrics(k=5, verbose=True)
