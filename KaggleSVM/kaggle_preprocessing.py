@@ -69,8 +69,6 @@ def boost_data(data, data_name, verbose=True, manual_boost=None):
                       "sehri", "sharia", "shia", "sunni", "shiism", "sufic", "sufism", "suhoor", "sunna", "koran",
                       "qur'an", "yashmak", "ISIS", "ISIL", "al-Qaeda", "Taliban"]
 
-    # TODO: see Sandra's email for suggestions
-
     # source: https://www.usatoday.com/story/news/2017/03/16/feminism-glossary-lexicon-language/99120600/
     metoo_wordbank = ["metoo", "feminism", "victim", "consent", "patriarchy", "sexism", "misogyny", "misandry",
                       "misogynoir", "cisgender", "transgender", "transphobia", "transmisogyny", "terf", "swef",
@@ -104,7 +102,6 @@ def boost_data(data, data_name, verbose=True, manual_boost=None):
     # manually observed abusive words in explicit examples
     explicitly_abusive = ["sh*tty"]
 
-    # future, TODO: https://thebestschools.org/magazine/controversial-topics-research-starter/
 
     if not manual_boost:
         # combine the above wordbanks
