@@ -77,22 +77,21 @@ def calc_oov(k, verbose):
                     # train_oov = boost_data(train, curr_fold_name, verbose, manual_boost=test_oov)
                     # pct_oov = round(len(train_oov) / train_len * 100, 2)
 
-                    # TODO: new metric: ratio of used; train over test
                     # ratio of used words between train and test. if 1, then equal
                     used_ratio = train_pct_used / test_pct_used
                     unused_ratio = train_pct_unused / test_pct_unused
 
                     row = [curr_fold_num] + train_metrics + test_metrics + [used_ratio, unused_ratio]
-                    return_list.append(row)  # debugging
+                    print(f"row: {row}")  # debugging
+                    return_list.append(row)
 
                 # export per sample
-                # columns = ["fold", "train_pct_used", "train_pct_unused", "train_num_used", "train_num_unused",
-                #           "test_pct_used", "test_pct_unused", "test_num_used", "test_num_unused", "used_ratio",
-                #           "unused_ratio"]
+                columns = ["fold", "train_pct_used", "train_pct_unused", "train_num_used", "train_num_unused",
+                           "test_pct_used", "test_pct_unused", "test_num_used", "test_num_unused", "used_ratio",
+                           "unused_ratio"]
                 print(f"final: {return_list}")  # debugging
                 print(f"final len: {len(return_list)}, len[0]: {len(return_list[0])}")
-                # return_df = pd.DataFrame([return_list], columns)
-                return_df = pd.DataFrame(return_list)
+                return_df = pd.DataFrame(return_list, columns=columns)
                 return_df.to_csv(oov_path, index=False)  # save results to csv
 
 
