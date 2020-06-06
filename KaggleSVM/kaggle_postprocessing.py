@@ -13,7 +13,6 @@ decimals = 2  # global variable for output
 
 
 # calculate % examples in given data that contains abusive words. returns df
-# TODO: multiprocessing library
 def percent_abusive(data, verbose):
     results_df = pd.DataFrame(columns=["pct_abusive", "source_lexicon"])
 
@@ -54,7 +53,7 @@ def calc_oov(k, verbose):
             filename = f"train.{s}{i}.csv"
 
             if path.exists(oov_path):  # check if results file already exists
-                print(f"OOV already computed for {filename}. Skipping...")  # TODO: are we really calculating OOV?
+                print(f"OOV already computed for {filename}. Skipping...")
             else:
                 data = read_data(filename, verbose)
                 folds = manual_kfold(data, k, state)
@@ -65,45 +64,17 @@ def calc_oov(k, verbose):
                     curr_fold_num += 1
                     curr_fold_name = f"{filename}:fold{curr_fold_num}"
                     train, test = f
-                    train_len = len(train)
-                    test_len = len(test)
 
                     print(f"Computing metrics for {curr_fold_name}...") if verbose else None
-
-                    # TODO: remove oov from this function
                     train_used, train_unused = get_usage_sets(train, lexicon)
                     test_used, test_unused = get_usage_sets(test, lexicon)
 
-                    # boost on common words + overwrite
-                    # train metrics
-                    train_used_boosted = boost_data(train, curr_fold_name, False, manual_boost=train_used)
-                    train_unused_boosted = boost_data(train, curr_fold_name, False, manual_boost=train_unused)
-                    train_num_used = len(train_used_boosted)
-                    train_num_unused = len(train_unused_boosted)
-                    train_pct_used = train_num_used / train_len * 100
-                    train_pct_unused = train_num_unused / train_len * 100
-
-                    # test metrics
-                    test_used_boosted = boost_data(test, curr_fold_name, False, manual_boost=test_used)
-                    test_unused_boosted = boost_data(test, curr_fold_name, False, manual_boost=test_unused)
-                    test_num_used = len(test_used_boosted)
-                    test_num_unused = len(test_unused_boosted)
-                    test_pct_used = test_num_used / test_len * 100
-                    test_pct_unused = test_num_unused / test_len * 100
-
-                    print(test_pct_used)
-                    print(test_pct_unused)
-
-                    # ratio of used words between train and test + others. if 1, then equal
-                    used_ratio = train_num_used / test_num_used
-                    unused_ratio = train_num_unused / test_num_unused
-
-                    # OOV
+                    # OoV
                     only_in_train = len(train_used & test_used) / len(test_used) * 100
                     oov = 100 - only_in_train
 
                     row = [curr_fold_num, oov]
-                    row = [round(x, decimals) for x in row]
+                    row = [round(x, decimals) for x in row]  # just in case other metrics are used
                     return_list.append(row)
 
                 # export per sample
@@ -112,7 +83,7 @@ def calc_oov(k, verbose):
                 print(f"OOV metrics computed.\n") if verbose else None
 
 
-""" Metrics-DF Helper Functions """
+""" OOV Helper Functions """
 
 
 # manually create test/train splits
@@ -132,6 +103,20 @@ def manual_kfold(data, k, state):
     return to_return
 
 
+# intersect + complement b/w given df and lexicon
+def get_usage_sets(df, lex):
+    df_words = get_words_set(df)
+    lex = set(lex)
+
+    # words in both df and lexicon (intersect)
+    vocab_used = df_words & lex
+
+    # words in lexicon but not df
+    vocab_unused = lex - df_words
+
+    return vocab_used, vocab_unused
+
+
 # given df (train or test), return set of words
 def get_words_set(data):
     comments = data["comment_text"].tolist()
@@ -148,20 +133,6 @@ def get_words_set(data):
 
     # TODO: verify that this works correctly
     return all_words
-
-
-# intersect + 2x complements b/w given df words and lexicon
-def get_usage_sets(df, lex):
-    df_words = get_words_set(df)
-    lex = set(lex)
-
-    # words in both df and lexicon (intersect)
-    vocab_used = df_words & lex
-
-    # words in lexicon but not df
-    vocab_unused = lex - df_words
-
-    return vocab_used, vocab_unused
 
 
 if __name__ == '__main__':
