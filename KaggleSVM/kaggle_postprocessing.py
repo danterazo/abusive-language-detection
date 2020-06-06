@@ -19,6 +19,7 @@ def percent_abusive(data):
                          "data/lexicon_wiegand/lexicon.wiegand.base.abusive.csv",
                          "data/lexicon_wiegand/lexicon.wiegand.expanded.abusive.csv"]
 
+    # NOTE: tried multithreading, but performance improvement was negligible (~10s) and it wasn't reliable
     for f in lexicon_filenames:
         f_split = f.split(".", 3)
         source = f_split[1] + "." + f_split[2]  # get source name from filename
@@ -58,6 +59,7 @@ def calc_oov(k):
                 vocab_used, vocab_unused, oov = set_ops(test, manual_lexicon)
 
                 # filter on vocab_used
+                # TODO: multithreading candidate
                 test_used = boost_data(train, "", False, manual_boost=vocab_used)
                 pct_used = round(len(test_used) / len(data) * 100, 2)
 
@@ -77,25 +79,6 @@ def calc_oov(k):
 
 
 """ OOV Helper Functions """
-
-"""
-# make oov_main instead
-def oov_export(X, y, clf, k, sample_type, i):
-    verbose = True  # TODO: arg, prop-like
-
-    oov_path = os.path.join("output/stats/oov", f"oov.{sample_type.lower()}{i}.csv")
-    if path.exists(oov_path):
-        print(f"Importing {sample_type}-sample SVM predictions...") if verbose else None
-        y_pred = pd.read_csv(pred_path)  # import if `y_pred` has already been computed
-        print(f"Data imported!") if verbose else None
-    else:
-        print(f"Fitting CountVectorizer & training {sample_type}-sample SVM...") if verbose else None
-        y_pred = cross_val_predict(clf, X, y, cv=k, n_jobs=14)  # else, compute
-        pd.DataFrame(y_pred).to_csv(pred_path, index=False)  # save preds
-        print(f"SVM trained!") if verbose else None
-
-    return y_pred
-"""
 
 
 # manually create test/train splits
