@@ -5,6 +5,8 @@ from kaggle_preprocessing import boost_data, read_data
 from kaggle_build import export_df
 from sklearn.model_selection import KFold
 import pandas as pd
+from os import path
+import os.path
 import re
 
 
@@ -42,11 +44,13 @@ def calc_oov(k):
 
     for s in sample_types:
         for i in range(1, per_sample + 1):
-            filename = f"train.{s}{i}.csv"
-            data = read_data(filename, verbose=False)
+            oov_path = os.path.join("output/stats/oov", f"oov.{s.lower()}{i}.csv")
+            data = read_data(f"train.{s}{i}.csv", verbose=False)
             folds = manual_kfold(data, k)
+            curr_fold_num = 0
 
             for f in folds:
+                curr_fold_num += 1
                 train = f[0]
                 test = f[1]
 
@@ -54,20 +58,44 @@ def calc_oov(k):
                 vocab_used, vocab_unused, oov = set_ops(test, manual_lexicon)
 
                 # filter on vocab_used
-                test_filtered = boost_data(train, "", False, manual_boost=vocab_used)
+                test_used = boost_data(train, "", False, manual_boost=vocab_used)
+                pct_used = round(len(test_used) / len(data) * 100, 2)
 
-                pct = round(len(test_filtered) / len(data) * 100, 2)
-                return_list.append([pct, filename])
+                # filter on vocab_unused
+                test_unused = boost_data(train, "", False, manual_boost=vocab_unused)
+                pct_unused = round(len(test_unused) / len(data) * 100, 2)
 
-                # TODO: export per sample?
+                # filter on oov
+                test_oov = boost_data(train, "", False, manual_boost=oov)
+                pct_oov = round(len(test_oov) / len(data) * 100, 2)
 
-            print(return_list)
+                return_list.append([curr_fold_num, pct_used, pct_unused, pct_oov])
 
-    # calculate results
+            # export per sample
+            return_df = pd.DataFrame(return_list, columns=["fold", "pct_used", "pct_unused", "pct_oov"])
+            return_df.to_csv(oov_path, index=True)  # save results to csv
 
-    return_df = pd.DataFrame(return_list, columns=["pct_abusive", "sample"])
-    print(f"\nreturn_df: {return_df}")
-    return return_df
+
+""" OOV Helper Functions """
+
+"""
+# make oov_main instead
+def oov_export(X, y, clf, k, sample_type, i):
+    verbose = True  # TODO: arg, prop-like
+
+    oov_path = os.path.join("output/stats/oov", f"oov.{sample_type.lower()}{i}.csv")
+    if path.exists(oov_path):
+        print(f"Importing {sample_type}-sample SVM predictions...") if verbose else None
+        y_pred = pd.read_csv(pred_path)  # import if `y_pred` has already been computed
+        print(f"Data imported!") if verbose else None
+    else:
+        print(f"Fitting CountVectorizer & training {sample_type}-sample SVM...") if verbose else None
+        y_pred = cross_val_predict(clf, X, y, cv=k, n_jobs=14)  # else, compute
+        pd.DataFrame(y_pred).to_csv(pred_path, index=False)  # save preds
+        print(f"SVM trained!") if verbose else None
+
+    return y_pred
+"""
 
 
 # manually create test/train splits
@@ -124,4 +152,4 @@ def set_ops(test, lex):
 
 
 if __name__ == '__main__':
-    print(calc_oov(k=5))
+    calc_oov(k=5)
