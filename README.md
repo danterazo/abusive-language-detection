@@ -31,7 +31,7 @@ This repository contains all of the resources you will need to replicate results
         | `samples`      | *str*        | **"all"**     | "random", "boosted_topic", "boosted_wordbank", "all" | Lets the user choose which sample types to train on.         |
         | `analyzer`     | *str*        | **"word"**    | "char", "word"                                       | Toggle n-gram analyzer.                                |
         | `ngram_range`  | *(int, int)* | **(1,3)**    | {i &#124; i&isin; Z<sup>+</sup>}                     | Couple (2-tuple) of lower and upper n-gram boundaries.           |
-        | `manual_boost` | *[str]*      | **["trump"]** | any array of strings whose length, **None**          | If not **None**, override predefined wordbanks when boosting. |
+        | `manual_boost` | *[str]*      | **["trump"]** | any list of strings whose length, **None**          | If not **None**, override predefined wordbanks when boosting. |
         | `rebuild`      | *bool*       | **False**     | True, False                                          | If **True**, resample + rebuild training data and lexicons. The former is computationally expensive. |
         | `repeats`      | *int*        | **3**         | {i &#124; i &isin; Z<sup>+</sup>, i > 0}             | Set the number of each sample type to build and train. Ignored if `rebuild` is **False**. |
         | `sample_size`  | *int*        | **20000**     | {i &#124; i &isin; Z<sup>+</sup>, i > 0}             | Set the size of each dataset when building. If any set has <2000 examples, the others will be trimmed to match it. Ignored if `rebuild` is **False**. |
@@ -124,7 +124,7 @@ left it in `kaggle_build.py` because it also exports them.
 
 #### `build_manual_lexicon()`
 Another wrapper function. This calls helper functions to import and process the manually-tagged lexicons. Finally,
-it combines them into one dataframe and exports it.
+it combines them into one DataFrame and exports it.
 - Params
     - None
 - Return
@@ -163,7 +163,7 @@ Strips unnecessary columns from Schaede's manually-tagged lexicon (`.csv`), then
 Writes the given DataFrame to storage.
 - Params
     - `sample_name` (*str*): the name of the sample; used to construct filename
-    - `data` (*df*): the dataframe to export
+    - `data` (*df*): the DataFrame to export
     - `extension` (*str*): the extension to save the df as. optional; defaults to `.csv`
 - Return
     - None
@@ -173,7 +173,7 @@ Writes the given DataFrame to storage.
 ### `export_df()`
 A more generalized version of `export_data()`. Doesn't prepend "train" to the filename and allows different filepaths.
 - Params
-    - `data` (*df*): the dataframe to export
+    - `data` (*df*): the DataFrame to export
     - `sample` (*str*): the type of sample + part of filename; can be blank
     - `i` (*int*): the index + part of filename; can be blank
     - `path` (*str*): the path to save the file; leave blank to save to CWD
@@ -213,7 +213,7 @@ Given a DataFrame, shuffle it and cut it down to the given size.
 Given data, return only rows containing predefined abusive words. Or, if given a wordbank, return rows containing any
 of those words instead.
 - Params
-    - `data` (*df*): dataframe to boost
+    - `data` (*df*): DataFrame to boost
     - `data_name` (*str*): filename for print statements; ignored if `verbose=FALSE`
     - `verbose` (*bool*): controls verbosity; default **TRUE**
     - `manual_boost` (*[str]*, or *None*): user-defined wordbank to boost on; default *None*
@@ -233,7 +233,7 @@ This is where the magic happens. Fits CountVectorizer, trains SVM, and prints + 
     - `samples` (*[str]*): three modes: "random", "boosted", or "all"
     - `analyzer` (*str*): either "word" or "char". for CountVectorizer
     - `ngram_range` (*(int,int)*): tuple containing lower and upper ngram bounds for CountVectorizer
-    - `manual_boost` (*[str]*): use given array of strings for filtering instead of built-in wordbanks. Or pass `None`
+    - `manual_boost` (*[str]*): use given list of strings for filtering instead of built-in wordbanks. Or pass `None`
     - `repeats` (*int*): controls the number of datasets built per sample type (if `rebuild` is **TRUE**)
     - `verbose` (*boolean*): toggles print statements
     - `sample_size` (*int*): size of sampled datasets. If set too high, the smaller size will be used
@@ -242,7 +242,7 @@ This is where the magic happens. Fits CountVectorizer, trains SVM, and prints + 
     - None
 - Write
     - `output/pred/pred.{sample_type}{i}` for index `i` and string `sample_type`, both defined in-function
-    - `output/stats/percent.{sample_type}{i}` if `calc_pct` is **TRUE**
+    - `output/stats/percent_abusive/percent.{sample_type}{i}` if `calc_pct` is **TRUE**
     - `output/report/report.{sample_type}{i}`
 
 ### `import_data()`
@@ -260,30 +260,60 @@ Helper function that queues datasets to be trained *per sample*. It reads `n` se
 If postprocessing wasn't already a word, it is now. This contains helper functions that work with data that has already been trained or processed.
 
 ### `percent_abusive()`
-This calculates how much of `data` is considered abusive. Uses all three lexicons: *manual*, *Wiegand Base*, and 
+This computes how much of `data` is considered abusive. Uses all three lexicons: *manual*, *Wiegand Base*, and 
 *Wiegand Extended*. Returns a DataFrame with a column of lexicon names and calculated percentages.
-
-TODO: Utilize the `multiprocessing` library for Python for parallel boosts. I got it to work but it hung up when joining jobs due to the Queue object.
-
 - Params
-    - `data` (*df*): dataframe to calculate abusive contents of
+    - `data` (*df*): DataFrame to calculate abusive contents of
 - Return
     - DataFrame of results: (*df*)
 - Write
     - None
+    
+TODO: Utilize the `multiprocessing` library for Python for parallel boosts. I got it to work but it hung up when joining jobs due to the Queue object.
 
-#### `boost_multithreaded()` (Deprecated)
-Calls `kaggle_preprocessing.boost_data()` and adds the result to a `multiprocessing.Queue` object. Returns both.
+### `calc_oov()`
+This simulates 5-fold cross validation on the sampled datasets (9 total), then calculates the percentage of out-of-vocabulary
+words per fold.
 - Params
-    - `data` (*df*): dataframe to boost
-    - `source` (*str*): lexicon name
-    - `manual_boost` (*[str]*): wordbank derived from the `source` lexicon
-    - `queue` (*`multiprocessing.Queue` object*): used to run all boosting jobs concurrently
+    - `k` (*int*): number of folds to use for cross-validation
+    - `verbose` (*bool*): toggle verbosity of function
 - Return
-    - Tuple containing the boosted dataset and the lexicon name: (*(df, str,)*)
+    - None
+- Write
+    - `stats/oov/oov.{sample_type}{i}` for index `i` and string `sample_type`, both defined in-function 
+    
+#### `manual_kfold()`
+Given a DataFrame, split into `k` folds and return list of train + test splits
+- Params
+    - `data` (*df*): the data to split
+    - `k` (*int*): number of folds to use for cross-validation
+    - `state`(*int*): controls the random state of `sklearn.model_selection.KFold`
+- Return
+    - List of lists of DataFrames: (*[[train1, test1], [train2, test2]...]*)
+        - each train/test pair is for one fold
+- Write
+    - None
+    
+#### `get_usage_sets()`
+Given a DataFrame and lexicon, return two sets: the words in both the df and lexicon (used words), and the words in the lexicon
+but not the df (unused words)>
+- Params
+    - `df` (*df*): the DataFrame to 
+    - `lex` (*[str]*)
+- Return
+    - Set of used words (*{}*)
+    - Set of unused words (*{}*)
 - Write
     - None
 
+##### `get_words_set()`
+Given a DataFrame of the correct format, create a set of words used in its `comment_text` feature.
+- Params
+    - `data` (*df*): the DataFrame to process
+- Return
+    - Set of strings (*{str}*)
+- Write
+    - None
 
 # Afterword
 Thanks for reading, and happy training!
