@@ -22,10 +22,7 @@ This repository contains all of the resources you will need to replicate results
       - See `nlpGPU_env.yml` for my NLP-focused conda env
 
 2. Clone
-    - First, set up Git LFS. It hosts the data
-        - `git lfs install`
-    - `git lfs clone https://github.com/danterazo/abusive-language-detection.git`
-        - Using `git lfs clone` allows for parallel downloads of large datasets
+- `git clone https://github.com/danterazo/abusive-language-detection.git`
   
 3. Configure
     - See the `main()` in `kaggle_train.py`
@@ -257,7 +254,42 @@ Helper function that queues datasets to be trained *per sample*. It reads `n` se
     - List of DataFrames: (*[df]*)
 - Write
     - None
+    
+### `pred_helper()`
+Helper function that checks for previously-computed `y_pred`. If it exists, print it; else, compute it.
+- Params
+    - `x` (*df*): data to predict
+    - `y` (*df*): class vector
+    - `clf` (*sklearn.pipeline.Pipeline*): CountVectorizer and SVM models
+    - `k` (*int*): number of folds to be used in cross-validation
+    - `sample_type` (*str*): name of sample type; used for filename checks + exports
+    - `i` (*int*): index; used for filename checks + exports
+    - `verbose` (*bool*): used to control verbosity of import / fit steps
+- Return
+    - None
+- Write
+    - `output/pred/pred.{sample_type}{i}.csv` if y_pred doesn't already exist for sample type and index `i`
 
+### `pct_helper()`
+Helper function that checks for previously-computed abusive-content percentages. If it exists, print it; else, compute it.
+- Params
+    - `data` (*df*): data to compute percentages for
+    - `sample_type` (*str*): name of sample type; used for filename checks + exports
+    - `i` (*int*): index; used for filename checks + exports
+    - `verbose` (*bool*): used to control verbosity of import / fit steps
+- Return
+    - None
+- Write
+    - `output/stats/percent_abusive/percent.{sample_type}{i}.csv` if percentage doesn't already exist for sample type and index `i`
+
+### `main()`
+Wrapper, called from real main. Protects inner-scope variables in `fit_data()`
+- Params
+    - None
+- Return
+    - None
+- Write
+    - None
 
 ## kaggle_postprocessing.py
 If postprocessing wasn't already a word, it is now. This contains helper functions that work with data that has already been trained or processed.

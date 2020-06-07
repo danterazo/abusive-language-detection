@@ -70,10 +70,10 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
             k = 5  # number of folds
 
             # calculate + export predictions
-            y_pred = pred_helper(X, y, clf, k, sample_type, i)
+            y_pred = pred_helper(X, y, clf, k, sample_type, i, verbose)
 
             # calculate % abusive
-            pct_helper(data, sample_type, i) if calc_pct else None
+            pct_helper(data, sample_type, i, verbose) if calc_pct else None
 
             # report results + export
             report = pd.DataFrame(classification_report(y, y_pred, output_dict=True)).transpose()
@@ -91,8 +91,8 @@ def import_data(sample_type, n):
     return to_return
 
 
-def pred_helper(x, y, clf, k, sample_type, i):
-    X = x  # as it should be
+def pred_helper(x, y, clf, k, sample_type, i, verbose):
+    X = x  # capitalized as it should be
 
     pred_path = path.join("output/pred/", f"pred.{sample_type.lower()}{i}.csv")
     if path.exists(pred_path):
@@ -108,16 +108,16 @@ def pred_helper(x, y, clf, k, sample_type, i):
     return y_pred
 
 
-def pct_helper(data, sample_type, i):
+def pct_helper(data, sample_type, i, verbose):
     pct_path = path.join("output/stats/percent_abusive", f"percent.{sample_type.lower()}{i}.csv")
     if path.exists(pct_path):
-        print(f"\nImporting {sample_type}-sample abusive content percentages...")
+        print(f"\nImporting {sample_type}-sample abusive content percentages...") if verbose else None
         pct = pd.read_csv(pct_path)  # import if already computed
-        print(f"Percentages Imported!")
+        print(f"Percentages Imported!") if verbose else None
     else:
-        print(f"\nCalculating {sample_type}-sample abusive content percentages...")
+        print(f"\nCalculating {sample_type}-sample abusive content percentages...") if verbose else None
         pct = calc_pct_abusive(data)  # else, calculate
-        print(f"Percentages calculated!")
+        print(f"Percentages calculated!") if verbose else None
 
     print(f"{pct}")
     export_df(pct, sample_type.lower(), i, path="output/stats/percent_abusive", prefix="percent", index=False)
