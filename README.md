@@ -22,7 +22,10 @@ This repository contains all of the resources you will need to replicate results
       - See `nlpGPU_env.yml` for my NLP-focused conda env
 
 2. Clone
-- `git clone https://github.com/danterazo/abusive-language-detection.git`
+    - First, set up Git LFS. It hosts the data
+        - `git lfs install`
+    - `git lfs clone https://github.com/danterazo/abusive-language-detection.git`
+        - Using `git lfs clone` allows for parallel downloads of large datasets
   
 3. Configure
     - See the `main()` in `kaggle_train.py`
