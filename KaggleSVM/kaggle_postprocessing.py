@@ -71,7 +71,7 @@ def calc_oov(k, verbose):
                     oov = 100 - only_in_train
 
                     row = [curr_fold_num, oov]
-                    row = [round(x, decimals) for x in row]  # just in case other metrics are used
+                    row = [round(x, decimals) for x in row]  # round all metrics used
                     return_list.append(row)
 
                 # export per sample
