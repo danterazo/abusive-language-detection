@@ -2,6 +2,7 @@
 # This file takes built data and reformats / averages / analyzes it
 # Dante Razo, drazo
 from os import path
+import os
 import re
 from statistics import mean, stdev, variance
 
@@ -47,7 +48,8 @@ def calc_oov(k, verbose):
 
     for s in sample_types:
         for i in range(1, per_sample + 1):
-            oov_path = path.join("output/stats/oov", f"oov.{s.lower()}{i}.csv")
+            oov_folder = "output/stats/oov"
+            oov_path = path.join(oov_folder, f"oov.{s.lower()}{i}.csv")
             filename = f"train.{s}{i}.csv"
 
             if path.exists(oov_path):  # check if results file already exists
@@ -76,13 +78,30 @@ def calc_oov(k, verbose):
                     row = [round(x, decimals) for x in row]  # round all per-split metrics used
                     return_list.append(row)
 
-                    # export sets
-                    # set_path = path.join("output/stats/oov/sets", f"oov.{s.lower()}{i}.csv")
-                    #   return_df.to_csv(oov_path, index=False)  # save results to csv
-                    pd.DataFrame(train_used).to_csv(path.join("output/stats/oov/sets",
-                                                              f"oov.{s.lower()}{i}.train_used.csv"), index=False)
+                    # export used/unused sets
+                    train_used_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.train_used.csv"
+                    train_used_dir = f"{oov_folder}/train/used"
+                    train_used_path = path.join(train_used_dir, train_used_filename)
+                    os.makedirs(train_used_dir) if not path.exists(train_used_dir) else None
+                    pd.DataFrame(train_used).to_csv(train_used_path, index=False, header=False)
 
-                    # TODO
+                    train_unused_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.train_unused.csv"
+                    train_unused_dir = f"{oov_folder}/train/unused"
+                    train_unused_path = path.join(train_unused_dir, train_unused_filename)
+                    os.makedirs(train_unused_dir) if not path.exists(train_unused_dir) else None
+                    pd.DataFrame(train_unused).to_csv(train_unused_path, index=False, header=False)
+
+                    test_used_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.test_used.csv"
+                    test_used_dir = f"{oov_folder}/test/used"
+                    test_used_path = path.join(test_used_dir, test_used_filename)
+                    os.makedirs(test_used_dir) if not path.exists(test_used_dir) else None
+                    pd.DataFrame(test_used).to_csv(test_used_path, index=False, header=False)
+
+                    test_unused_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.test_unused.csv"
+                    test_unused_dir = f"{oov_folder}/test/unused"
+                    test_unused_path = path.join(test_unused_dir, test_unused_filename)
+                    os.makedirs(test_unused_dir) if not path.exists(test_unused_dir) else None
+                    pd.DataFrame(test_unused).to_csv(test_unused_path, index=False, header=False)
 
                 # per-sample stats (on all `k` folds)
                 just_nums = [x[1] for x in return_list]  # get only numbers, not names
