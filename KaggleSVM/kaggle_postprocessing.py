@@ -3,6 +3,7 @@
 # Dante Razo, drazo
 from os import path
 import re
+from statistics import mean, stdev, variance
 
 from kaggle_preprocessing import boost_data, read_data
 from sklearn.model_selection import KFold
@@ -67,15 +68,31 @@ def calc_oov(k, verbose):
                     test_used, test_unused = get_usage_sets(test, lexicon)
 
                     # OoV
-                    only_in_train = len(train_used & test_used) / len(test_used) * 100
-                    oov = 100 - only_in_train
+                    only_in_train = len(train_used & test_used) / len(test_used) * 100  # float
+                    oov = 100 - only_in_train  # float
 
+                    # add row to list of rows
                     row = [curr_fold_num, oov]
-                    row = [round(x, decimals) for x in row]  # round all metrics used
+                    row = [round(x, decimals) for x in row]  # round all per-split metrics used
                     return_list.append(row)
 
+                    # export sets
+                    # set_path = path.join("output/stats/oov/sets", f"oov.{s.lower()}{i}.csv")
+                    #   return_df.to_csv(oov_path, index=False)  # save results to csv
+                    pd.DataFrame(train_used).to_csv(path.join("output/stats/oov/sets",
+                                                              f"oov.{s.lower()}{i}.train_used.csv"), index=False)
+
+                    # TODO
+
+                # per-sample stats (on all `k` folds)
+                just_nums = [x[1] for x in return_list]  # get only numbers, not names
+                avg = ["avg", round(mean(just_nums), decimals)]
+                var = ["var", round(variance(just_nums), decimals)]
+                std = ["std", round(stdev(just_nums), decimals)]
+                return_list.extend([[], avg, var, std])  # separate stats from rest w/ blank row + append stats
+
                 # export per sample
-                return_df = pd.DataFrame(return_list, columns=df_columns)
+                return_df = pd.DataFrame(return_list, columns=df_columns)  # list -> df
                 return_df.to_csv(oov_path, index=False)  # save results to csv
                 print(f"OOV metrics computed.\n") if verbose else None
 
