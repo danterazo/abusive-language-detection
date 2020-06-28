@@ -19,7 +19,7 @@ def calc_pct_abusive(data, verbose):
                          "data/lexicon_wiegand/lexicon.wiegand.base.abusive.csv",
                          "data/lexicon_wiegand/lexicon.wiegand.expanded.abusive.csv"]
 
-    # NOTE: tried multithreading, but performance improvement was negligible (~10s) and it wasn't reliable
+    # NOTE: tried multithreading, but performance improvement was negligible and it wasn't reliable
     for f in lexicon_filenames:
         print(f"Computing % abusive for {f}...") if verbose else None
         f_split = f.split(".", 3)
