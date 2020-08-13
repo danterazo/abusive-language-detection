@@ -1,4 +1,4 @@
-# LING-X 490: Abusive Language Detection
+# LING-X 490: Abusive Language Detection Research
 # This file trains SVMs on uniquely-sampled datasets
 # Dante Razo, drazo, 2020-05-15
 from os import path

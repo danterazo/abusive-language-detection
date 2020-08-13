@@ -1,10 +1,10 @@
 # Introduction & Research Goals 
-The goal of this project is to improve abusive language detection, with a focus on implicit abuse. **Python** was used for data preprocessing, dataset builds, and SVM training. **R** was used to verify dataset properties (e.g. length, headers, etc.). The paper was written in and compiled from **LaTeX**.
+The goal of this project is to improve abusive language detection with a focus on implicit abuse. **Python** was used for data preprocessing, dataset builds, and SVM training. **R** was used to verify dataset properties (e.g. length, headers, etc.). The paper was written in and compiled from **LaTeX**.
 
 ## Paper
 The paper is a WIP but will include detailed research methods, results, citations, and more.
 
-Once paper is accepted, see `Paper/` for a compiled PDF, uncompiled LaTeX, and assets.
+Once the paper is accepted, see `Paper/` for a compiled PDF, uncompiled LaTeX, and assets.
 
 The plan is to submit this paper to the [_Fourth Workshop on Online Abuse and Harms_](https://www.aclweb.org/portal/content/fourth-workshop-online-abuse-and-harms) (WOAH), co-located with the 2020 conference on _Empirical Methods in Natural Language Processing_ (EMNLP 2020).
 
