@@ -12,7 +12,7 @@ The plan is to submit this paper to the [_Fourth Workshop on Online Abuse and Ha
 Work in progress. Stay tuned!
 
 # Code
-This repository contains all of the resources you will need to replicate results. Boosting data takes an absurd amount of time depending on the lexicon used; I recommend using a computer with at least **4c/4t** and **16GB** of memory. Again, this is a recommendation and not a requirement.
+This repository contains all of the resources you will need to replicate results. Boosting data takes an absurd amount of time depending on the lexicon used; I recommend using a computer with at least **4c/4t** and **16GB** of memory. This is merely a recommendation and not a requirement.
 
 ## Running the script
 1. Install dependencies
