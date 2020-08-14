@@ -16,10 +16,10 @@ This repository contains all of the resources you will need to replicate results
 
 ## Running the script
 1. Install dependencies
-    - **Pip**: `pip3 install -r requirements.txt`
-    - **Conda**: `conda install --file requirements.txt`
-      - Select the desired conda `env` before installing
-      - See `nlpGPU_env.yml` for my NLP-focused conda env
+    - **Vanilla Python**: `pip3 install -r requirements.txt`
+    - **Conda**: 
+      1. Select the desired conda `env` before installing (see `nlpGPU_env.yml` for my NLP-focused conda env)
+      2. `conda install --file requirements.txt`
 
 2. Clone
 - `git clone https://github.com/danterazo/abusive-language-detection.git`
