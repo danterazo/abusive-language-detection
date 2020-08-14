@@ -30,7 +30,7 @@ This repository contains all of the resources you will need to replicate results
         | ------------ | ------------ | ------------- | ---------------------------------------------------- | ------------------------------------------------------------ |
         | `samples`      | *str*        | **"all"**     | "random", "boosted_topic", "boosted_wordbank", "all" | Lets the user choose which sample types to train on.         |
         | `analyzer`     | *str*        | **"word"**    | "char", "word"                                       | Toggle n-gram analyzer.                                |
-        | `ngram_range`  | *(int, int)* | **(1,3)**    | {i &#124; i&isin; Z<sup>+</sup>}                     | Couple (2-tuple) of lower and upper n-gram boundaries.           |
+        | `ngram_range`  | *(int, int)* | **(1,3)**    | {i &#124; i &isin; Z<sup>+</sup>}                     | Couple (2-tuple) of lower and upper n-gram boundaries.           |
         | `manual_boost` | *[str]*      | **["trump"]** | a list of strings OR **None**          | If not **None**, override predefined wordbanks when boosting. |
         | `rebuild`      | *bool*       | **False**     | True, False                                          | If **True**, resample + rebuild training data and lexicons. The former is computationally expensive. |
         | `repeats`      | *int*        | **3**         | {i &#124; i &isin; Z<sup>+</sup>, i > 0}             | Set the number of each sample type to build and train. Ignored if `rebuild` is **False**. |
