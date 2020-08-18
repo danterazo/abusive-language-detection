@@ -132,7 +132,7 @@ def main():
         samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
         analyzer = "word"  # "char" or "word"
         ngram_range = (1, 3,)  # int 2-tuple (couple)
-        manual_boost = ["trump"]  # ["trump"]  # None, or a list of strings
+        manual_boost = ["trump"]  # None, or a list of strings
         rebuild = False  # rebuild datasets + export
         repeats = 3  # number of datasets per sample type
         verbose = True  # suppresses prints if FALSE

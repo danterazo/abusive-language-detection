@@ -30,7 +30,7 @@ def read_data(dataset, verbose=True):
     data = pd.DataFrame(data_list, columns=["score", "comment_text"])
     print(f"Data {data.shape} imported!\n") if verbose else None  # progress indicator
 
-    kaggle_threshold = 0.50  # from Kaggle documentation (see page)
+    kaggle_threshold = 0.50  # from Kaggle documentation
 
     # create class vector
     data["class"] = 0
