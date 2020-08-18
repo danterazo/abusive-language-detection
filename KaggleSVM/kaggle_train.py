@@ -24,9 +24,9 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
     rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
     samples ([str]):    three modes: "random", "boosted", or "all"
     analyzer (str):     either "word" or "char". for CountVectorizer
-    ngram_range ((int,int)):   tuple containing lower and upper ngram bounds for CountVectorizer
-    manual_boost ([str]):   use given list of strings for filtering instead of built-in wordbanks. Or pass `None`
-    per_sample (int):      controls the number of datasets built per sample type (if `rebuild` is TRUE)
+    ngram_range ((int,int)):    tuple containing lower and upper ngram bounds for CountVectorizer
+    manual_boost ([str]):       use given list of strings for filtering instead of built-in wordbanks. Or pass `None`
+    per_sample (int):           controls the number of datasets built per sample type (if `rebuild` is TRUE)
     verbose (boolean):  toggles print statements
     sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
     calc_pct (bool):    if TRUE, calculate percentage of abusive words in each sample
