@@ -56,17 +56,17 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
             sample_type = sample[1].capitalize()  # second member of tuple is a string
             print(f"===== {sample_type}-sample: pass {i} =====") if verbose else None
 
-            # Store data as vectors
+            # store data as vectors
             X = data["comment_text"]  # initially reversed because it was easier to separate that way
             y = data["class"]
 
-            # Model pipeline
+            # model pipeline
             print("Instantiating model pipeline (CV & SVM)...") if verbose else None
             vec = CountVectorizer(analyzer="word", ngram_range=ngram_range)
             svc = SVC(C=1000, kernel="rbf", gamma=0.001)  # GridSearch best params
             clf = Pipeline([('vect', vec), ('svm', svc)])
 
-            # Testing + results
+            # testing + results
             k = 5  # number of folds
 
             # calculate + export predictions
