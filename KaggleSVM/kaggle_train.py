@@ -19,14 +19,14 @@ run = 1  # convenient flag at top of file
 
 
 # for each fold of each dataset of each sample type, train an SVM
-def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct):
+def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, verbose, sample_size, calc_pct):
     """
     rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
     samples ([str]):    three modes: "random", "boosted", or "all"
     analyzer (str):     either "word" or "char". for CountVectorizer
     ngram_range ((int,int)):   tuple containing lower and upper ngram bounds for CountVectorizer
     manual_boost ([str]):   use given list of strings for filtering instead of built-in wordbanks. Or pass `None`
-    repeats (int):      controls the number of datasets built per sample type (if `rebuild` is TRUE)
+    per_sample (int):      controls the number of datasets built per sample type (if `rebuild` is TRUE)
     verbose (boolean):  toggles print statements
     sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
     calc_pct (bool):    if TRUE, calculate percentage of abusive words in each sample
@@ -34,13 +34,13 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, ver
 
     # rebuild datasets
     if rebuild:
-        build_datasets(samples, manual_boost, repeats, sample_size, verbose)
+        build_datasets(samples, manual_boost, per_sample, sample_size, verbose)
         build_lexicons()
 
     # struct example: [([random1, random2, ..., random_n], "random"), ...]
     all_data = []
     for x in ["random", "topic", "wordbank"]:
-        all_data.append((import_data(x, repeats), x))
+        all_data.append((import_data(x, per_sample), x))
 
     # choose one or the other sample type if desired
     if samples is "random":
