@@ -45,7 +45,7 @@ def build_boosted(data, manual_boost, sample_size, repeats=3):
     export_data("wordbank", to_export)
 
 
-# save data to `.tsv`, `.CSV`, etc.
+# save data to `.TSV`, `.CSV`, etc.
 def export_data(sample_name, data, extension=".CSV"):
     i = 1
 
