@@ -30,7 +30,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
     verbose (boolean):  toggles print statements
     sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
     calc_pct (bool):    if TRUE, calculate percentage of abusive words in each sample
-    decimals (int):     number of decimals to round the above percentages to (pct of abusive words)
+    decimals (int):     number of decimals to round percentages to
     """
 
     # rebuild datasets
@@ -80,16 +80,30 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
 
             # report results + export
             report = pd.DataFrame(classification_report(y, y_pred, output_dict=True)).transpose()
+            report = round_report_df(report_to_percentage(report), decimals)  # convert precision + recall columns to percentages + round
+
             print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{report}\n")
             export_df(report, sample_type, i, path="output/report", prefix="report")
             reports_to_avg.append(report)
             i += 1
 
-        # TODO: sample all `n` sets
         print(f"===== {sample_type}-sample: Average of {len(reports_to_avg)} =====") if verbose else None
         averaged = pd.concat(reports_to_avg).groupby(level=0).mean()  # average all reports for a given sample type
-        print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{averaged}\n")
+        averaged = round_report_df(averaged, decimals)  # convert precision + recall columns to percentages + round
         export_df(averaged, sample_type, i=".avg", path="output/report", prefix="report")  # export the averaged report
+        print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{averaged}\n")
+
+
+def report_to_percentage(report):
+    report.iloc[:, [0, 1]] = report.iloc[:, [0, 1]] * 100  # float -> percentage on select columns (precision, recall)
+    return report
+
+
+def round_report_df(report, decimals):
+    report.iloc[:, [0, 1]] = report.iloc[:, [0, 1]].round(decimals)  # round select columns (precision, recall)
+    # TODO: round F1 score as well?
+
+    return report
 
 
 def import_data(sample_type, n):
@@ -133,10 +147,7 @@ def pct_helper(data, sample_type, i, decimals, verbose):
     export_df(pct, sample_type.lower(), i, path="output/stats/percent_abusive", prefix="percent", index=False)
 
 
-""" MAIN """
-
-
-# separate main to protect variable names in inner scope
+# separate Main to protect variable names in inner scope
 def main():
     if run is 1:
         samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
@@ -147,7 +158,7 @@ def main():
         repeats = 3  # number of datasets per sample type
         verbose = True  # suppresses prints if FALSE
         calc_pct = True  # calculate abusive example percentage per sample
-        decimals = 2  # number of decimals to round abusive example percentages to (doesn't round training scores)
+        decimals = 2  # number of decimals to round percentages to (e.g. abusive example percentages, in classification reports, etc.)
         sample_size = 20000
 
         fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct, decimals)
