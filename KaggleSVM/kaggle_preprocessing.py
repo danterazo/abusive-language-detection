@@ -19,9 +19,9 @@ def read_data(dataset, verbose=True):
         entries = d.readlines()
 
         for e in entries:
-            if extension == ".tsv":
+            if extension == ".TSV":
                 split_line = e.split("\t", 1)
-            else:  # default: csv
+            else:  # default: CSV
                 split_line = e.split(",", 1)
 
             if len(split_line) is 2:  # else: there's no score, so throw the example out

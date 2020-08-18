@@ -19,7 +19,7 @@ run = 1  # convenient flag at top of file
 
 
 # for each fold of each dataset of each sample type, train an SVM
-def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, verbose, sample_size, calc_pct):
+def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, verbose, sample_size, calc_pct, decimals):
     """
     rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
     samples ([str]):    three modes: "random", "boosted", or "all"
@@ -30,6 +30,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
     verbose (boolean):  toggles print statements
     sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
     calc_pct (bool):    if TRUE, calculate percentage of abusive words in each sample
+    decimals (int):     number of decimals to round the above percentages to (pct of abusive words)
     """
 
     # rebuild datasets
@@ -50,11 +51,13 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
 
     for sample in all_data:  # for each sample type...
         i = 1
+        reports_to_avg = []  # list of reports to soon be averaged
+        sample_type = ""  # sample type name (e.g. "random", "boosted", etc.) in outer scope for preservation
 
         for set in sample[0]:  # for each set...
             data = pd.DataFrame(set)  # first member of tuple is the dataframe
-            sample_type = sample[1].capitalize()  # second member of tuple is a string
-            print(f"===== {sample_type}-sample: pass {i} =====") if verbose else None
+            sample_type = sample[1].lower()  # second member of tuple is a string
+            print(f"===== {sample_type.capitalize()}-sample: pass {i} =====") if verbose else None
 
             # store data as vectors
             X = data["comment_text"]  # initially reversed because it was easier to separate that way
@@ -73,20 +76,27 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
             y_pred = pred_helper(X, y, clf, k, sample_type, i, verbose)
 
             # calculate % abusive
-            pct_helper(data, sample_type, i, verbose) if calc_pct else None
+            pct_helper(data, sample_type, i, decimals, verbose) if calc_pct else None
 
             # report results + export
             report = pd.DataFrame(classification_report(y, y_pred, output_dict=True)).transpose()
-            print(f"\nClassification Report[{sample_type.lower()}, {analyzer}, ngram_range{ngram_range}]:\n{report}\n")
+            print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{report}\n")
             export_df(report, sample_type, i, path="output/report", prefix="report")
+            reports_to_avg.append(report)
             i += 1
+
+        # TODO: sample all `n` sets
+        print(f"===== {sample_type}-sample: Average of {len(reports_to_avg)} =====") if verbose else None
+        averaged = pd.concat(reports_to_avg).groupby(level=0).mean()  # average all reports for a given sample type
+        print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{averaged}\n")
+        export_df(averaged, sample_type, i=".avg", path="output/report", prefix="report")  # export the averaged report
 
 
 def import_data(sample_type, n):
     to_return = []
 
     for i in range(1, n + 1):
-        to_return.append(read_data(f"train.{sample_type}{i}.csv", verbose=False))
+        to_return.append(read_data(f"train.{sample_type}{i}.CSV", verbose=False))
 
     return to_return
 
@@ -94,7 +104,7 @@ def import_data(sample_type, n):
 def pred_helper(x, y, clf, k, sample_type, i, verbose):
     X = x  # capitalized as it should be
 
-    pred_path = path.join("output/pred/", f"pred.{sample_type.lower()}{i}.csv")
+    pred_path = path.join("output/pred/", f"pred.{sample_type.lower()}{i}.CSV")
     if path.exists(pred_path):
         print(f"Importing {sample_type}-sample SVM predictions...") if verbose else None
         y_pred = pd.read_csv(pred_path)  # import if `y_pred` has already been computed
@@ -108,15 +118,15 @@ def pred_helper(x, y, clf, k, sample_type, i, verbose):
     return y_pred
 
 
-def pct_helper(data, sample_type, i, verbose):
-    pct_path = path.join("output/stats/percent_abusive", f"percent.{sample_type.lower()}{i}.csv")
+def pct_helper(data, sample_type, i, decimals, verbose):
+    pct_path = path.join("output/stats/percent_abusive", f"percent.{sample_type.lower()}{i}.CSV")
     if path.exists(pct_path):
         print(f"\nImporting {sample_type}-sample abusive content percentages...") if verbose else None
         pct = pd.read_csv(pct_path)  # import if already computed
         print(f"Percentages Imported!") if verbose else None
     else:
         print(f"\nCalculating {sample_type}-sample abusive content percentages...") if verbose else None
-        pct = calc_pct_abusive(data)  # else, calculate
+        pct = calc_pct_abusive(data, decimals, verbose)  # else, calculate
         print(f"Percentages calculated!") if verbose else None
 
     print(f"{pct}")
@@ -137,9 +147,10 @@ def main():
         repeats = 3  # number of datasets per sample type
         verbose = True  # suppresses prints if FALSE
         calc_pct = True  # calculate abusive example percentage per sample
+        decimals = 2  # number of decimals to round abusive example percentages to (doesn't round training scores)
         sample_size = 20000
 
-        fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct)
+        fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct, decimals)
 
 
 # need main for future multithreaded function calls

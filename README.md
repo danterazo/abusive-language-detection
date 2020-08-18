@@ -238,6 +238,7 @@ This is where the magic happens. Fits CountVectorizer, trains SVM, and prints + 
     - `verbose` (*boolean*): toggles print statements
     - `sample_size` (*int*): size of sampled datasets. If set too high, the smaller size will be used
     - `calc_pct` (*bool*): if **TRUE**, calculate percentage of abusive words in each sample
+    - `decimals``(*int*): number of decimals to round the above percentages to (pct of abusive words)
 - Return
     - None
 - Write

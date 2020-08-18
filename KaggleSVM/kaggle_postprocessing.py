@@ -12,12 +12,12 @@ import pandas as pd
 
 
 # calculate % examples in given data that contains abusive words. returns df
-def calc_pct_abusive(data, verbose):
+def calc_pct_abusive(data, decimals, verbose):
     results_df = pd.DataFrame(columns=["pct_abusive", "source_lexicon"])
 
-    lexicon_filenames = ["data/lexicon_manual/lexicon.manual.all.abusive.csv",
-                         "data/lexicon_wiegand/lexicon.wiegand.base.abusive.csv",
-                         "data/lexicon_wiegand/lexicon.wiegand.expanded.abusive.csv"]
+    lexicon_filenames = ["data/lexicon_manual/lexicon.manual.all.abusive.CSV",
+                         "data/lexicon_wiegand/lexicon.wiegand.base.abusive.CSV",
+                         "data/lexicon_wiegand/lexicon.wiegand.expanded.abusive.CSV"]
 
     # NOTE: tried multithreading, but performance improvement was negligible and it wasn't reliable
     for f in lexicon_filenames:
@@ -37,8 +37,8 @@ def calc_pct_abusive(data, verbose):
 
 # return percent of words that occur in `test` but NOT `train` splits
 # oov: out-of-vocabulary
-def calc_oov(k, verbose):
-    lexicon = open("data/lexicon_manual/lexicon.manual.all.abusive.csv").read().splitlines()  # read as list
+def calc_oov(k, decimals, verbose):
+    lexicon = open("data/lexicon_manual/lexicon.manual.all.abusive.CSV").read().splitlines()  # read as list
     df_columns = ["fold", "oov"]
 
     # unfortunately all the data is in one folder, so I need to manually pick out the relevant sets here
@@ -49,8 +49,8 @@ def calc_oov(k, verbose):
     for s in sample_types:
         for i in range(1, per_sample + 1):
             oov_folder = "output/stats/oov"
-            oov_path = path.join(oov_folder, f"oov.{s.lower()}{i}.csv")
-            filename = f"train.{s}{i}.csv"
+            oov_path = path.join(oov_folder, f"oov.{s.lower()}{i}.CSV")
+            filename = f"train.{s}{i}.CSV"
 
             if path.exists(oov_path):  # check if results file already exists
                 print(f"OOV already computed for {filename}. Skipping...")
@@ -79,25 +79,25 @@ def calc_oov(k, verbose):
                     return_list.append(row)
 
                     # export used/unused sets
-                    train_used_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.train_used.csv"
+                    train_used_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.train_used.CSV"
                     train_used_dir = f"{oov_folder}/train/used"
                     train_used_path = path.join(train_used_dir, train_used_filename)
                     os.makedirs(train_used_dir) if not path.exists(train_used_dir) else None
                     pd.DataFrame(train_used).to_csv(train_used_path, index=False, header=False)
 
-                    train_unused_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.train_unused.csv"
+                    train_unused_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.train_unused.CSV"
                     train_unused_dir = f"{oov_folder}/train/unused"
                     train_unused_path = path.join(train_unused_dir, train_unused_filename)
                     os.makedirs(train_unused_dir) if not path.exists(train_unused_dir) else None
                     pd.DataFrame(train_unused).to_csv(train_unused_path, index=False, header=False)
 
-                    test_used_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.test_used.csv"
+                    test_used_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.test_used.CSV"
                     test_used_dir = f"{oov_folder}/test/used"
                     test_used_path = path.join(test_used_dir, test_used_filename)
                     os.makedirs(test_used_dir) if not path.exists(test_used_dir) else None
                     pd.DataFrame(test_used).to_csv(test_used_path, index=False, header=False)
 
-                    test_unused_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.test_unused.csv"
+                    test_unused_filename = f"oov.{s.lower()}{i}.fold{curr_fold_num}.test_unused.CSV"
                     test_unused_dir = f"{oov_folder}/test/unused"
                     test_unused_path = path.join(test_unused_dir, test_unused_filename)
                     os.makedirs(test_unused_dir) if not path.exists(test_unused_dir) else None
@@ -168,6 +168,6 @@ def get_words_set(df):
 
 
 if __name__ == '__main__':
-    decimals = 2  # global variable for output
+    decimals = 2  # round output
 
-    calc_oov(k=5, verbose=True)
+    calc_oov(k=5, decimals=decimals, verbose=True)

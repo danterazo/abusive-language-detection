@@ -15,7 +15,7 @@ def get_train():
     return read_data(dataset)
 
 
-# Gets 'n' posts, randomly selected, from the dataset. Then save to `.csv`
+# Gets 'n' posts, randomly selected, from the dataset. Then save to `.CSV`
 def build_random(data, sample_size, repeats=3):
     to_export = []
     # sample + export
@@ -45,8 +45,8 @@ def build_boosted(data, manual_boost, sample_size, repeats=3):
     export_data("wordbank", to_export)
 
 
-# save data to `.tsv`, `.csv`, etc.
-def export_data(sample_name, data, extension=".csv"):
+# save data to `.tsv`, `.CSV`, etc.
+def export_data(sample_name, data, extension=".CSV"):
     i = 1
 
     for d in data:
@@ -55,9 +55,9 @@ def export_data(sample_name, data, extension=".csv"):
         i += 1
 
 
-# generalized version of the above. `.csv`
+# generalized version of the above. `.CSV`
 def export_df(data, sample="no_sample", i="", path="", prefix="", index=True):
-    filepath = os.path.join(path, f"{prefix}.{sample}{i}.csv")
+    filepath = os.path.join(path, f"{prefix}.{sample}{i}.CSV")
     data.to_csv(filepath, index=index, header=True)
 
 
@@ -186,13 +186,13 @@ def export_lexicons():
 
     # export
     os.chdir("lexicon_wiegand")
-    base.to_csv("lexicon.wiegand.base.csv", sep=",", header=0, index=False)
-    exp.to_csv("lexicon.wiegand.expanded.csv", sep=",", header=0, index=False)
-    base_abusive.to_csv("lexicon.wiegand.base.abusive.csv", sep=",", header=0, index=False)
-    exp_abusive.to_csv("lexicon.wiegand.expanded.abusive.csv", sep=",", header=0, index=False)
+    base.to_csv("lexicon.wiegand.base.CSV", sep=",", header=0, index=False)
+    exp.to_csv("lexicon.wiegand.expanded.CSV", sep=",", header=0, index=False)
+    base_abusive.to_csv("lexicon.wiegand.base.abusive.CSV", sep=",", header=0, index=False)
+    exp_abusive.to_csv("lexicon.wiegand.expanded.abusive.CSV", sep=",", header=0, index=False)
 
     os.chdir("../lexicon_manual")
-    rds_abusive.to_csv("lexicon.manual.all.abusive.csv", sep=",", header=0, index=False)
+    rds_abusive.to_csv("lexicon.manual.all.abusive.CSV", sep=",", header=0, index=False)
 
     os.chdir(cwd)  # go back to previous cwd
 
