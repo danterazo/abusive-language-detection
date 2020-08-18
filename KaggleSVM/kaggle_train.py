@@ -87,8 +87,9 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
             reports_to_avg.append(report)
             i += 1
 
+        # average all reports of the same sample type (e.g. random1, random2, random3)
         print(f"===== {sample_type}-sample: Average of {len(reports_to_avg)} =====") if verbose else None
-        averaged = pd.concat(reports_to_avg).groupby(level=0).mean()  # average all reports for a given sample type
+        averaged = pd.concat(reports_to_avg).groupby(level=0).mean()  # given a list of dataframes, average their values
         averaged = round_report_df(averaged, decimals)  # convert precision + recall columns to percentages + round
         export_df(averaged, sample_type, i=".avg", path="output/report", prefix="report")  # export the averaged report
         print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{averaged}\n")
