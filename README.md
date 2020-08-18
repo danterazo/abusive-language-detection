@@ -17,7 +17,7 @@ This repository contains all of the resources you will need to replicate results
 ## Running the script
 1. Install dependencies
     - **Vanilla Python**: `pip3 install -r requirements.txt`
-    - **Conda**: 
+    - **Conda**:
       1. Select the desired conda `env` before installing (see `nlpGPU_env.yml` for my NLP-focused conda env)
       2. `conda install --file requirements.txt`
 
