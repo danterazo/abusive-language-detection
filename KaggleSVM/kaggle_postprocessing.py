@@ -13,32 +13,36 @@ import pandas as pd
 
 # calculate % examples in given data that contains abusive words. returns df
 def calc_pct_abusive(data, decimals, verbose):
-    results_df = pd.DataFrame(columns=["pct_abusive", "source_lexicon"])
+    data_abusive = data[data["class"] == 1]  # filter data to only abusive examples
 
-    lexicon_filenames = ["data/lexicon_manual/lexicon.manual.all.abusive.CSV",
-                         "data/lexicon_wiegand/lexicon.wiegand.base.abusive.CSV",
-                         "data/lexicon_wiegand/lexicon.wiegand.expanded.abusive.CSV"]
+    results_df = pd.DataFrame(columns=["pct_explicit", "pct_implicit", "source_lexicon"])
+
+    lexicon_paths = ["data/lexicon_manual/lexicon.manual.all.explicit.CSV",
+                     "data/lexicon_wiegand/lexicon.wiegand.base.explicit.CSV",
+                     "data/lexicon_wiegand/lexicon.wiegand.expanded.explicit.CSV"]
 
     # NOTE: tried multithreading, but performance improvement was negligible and it wasn't reliable
-    for f in lexicon_filenames:
-        print(f"Computing % abusive for {f}...") if verbose else None
-        f_split = f.split(".", 3)
-        source = f_split[1] + "." + f_split[2]  # get source name from filename
+    # TODO: joblib threading?
+    for filename in lexicon_paths:
+        print(f"Computing % abusive for {filename}...") if verbose else None
+        filename_split = filename.split(".", 3)  # split filename into three parts: path, filename,
+        source_name = filename_split[1] + "." + filename_split[2]  # get source name from filename
 
-        boost_list = open(f).read().splitlines()  # read file as list
-        boosted_df = boost_data(data, "", False, manual_boost=boost_list)
-        pct = round(len(boosted_df) / len(data) * 100, decimals)
+        explicit_list = open(filename).read().splitlines()  # list of explicitly abusive words
+        data_explicit = boost_data(data_abusive, "", False, manual_boost=explicit_list)
 
-        results_df.loc[len(results_df)] = [pct, source]
+        pct_explicit = round(len(data_explicit) / len(data_abusive) * 100, decimals)
+        pct_implicit = 100 - pct_explicit
+
+        results_df.loc[len(results_df)] = [pct_explicit, pct_implicit, source_name]
         print(f"Computed.\n") if verbose else None
 
     return results_df
 
-
 # return percent of words that occur in `test` but NOT `train` splits
 # oov: out-of-vocabulary
 def calc_oov(k, decimals, verbose):
-    lexicon = open("data/lexicon_manual/lexicon.manual.all.abusive.CSV").read().splitlines()  # read as list
+    lexicon = open("data/lexicon_manual/lexicon.manual.all.explicit.csv").read().splitlines()  # read as list
     df_columns = ["fold", "oov"]
 
     # unfortunately all the data is in one folder, so I need to manually pick out the relevant sets here

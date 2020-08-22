@@ -1,4 +1,4 @@
-pct_abusive,source_lexicon
-22.69,manual.all
-58.7,wiegand.base
-89.34,wiegand.expanded
+pct_explicit,pct_implicit,source_lexicon
+36.92,63.08,manual.all
+74.0,26.0,wiegand.base
+95.13,4.8700000000000045,wiegand.expanded
