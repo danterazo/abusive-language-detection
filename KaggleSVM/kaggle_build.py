@@ -190,11 +190,11 @@ def export_lexicons():
     os.chdir("lexicon_wiegand")
     base.to_csv("lexicon.wiegand.base.CSV", sep=",", header=0, index=False)
     exp.to_csv("lexicon.wiegand.expanded.CSV", sep=",", header=0, index=False)
-    base_abusive.to_csv("lexicon.wiegand.base.abusive.CSV", sep=",", header=0, index=False)
-    exp_abusive.to_csv("lexicon.wiegand.expanded.abusive.CSV", sep=",", header=0, index=False)
+    base_abusive.to_csv("lexicon.wiegand.base.explicit.CSV", sep=",", header=0, index=False)
+    exp_abusive.to_csv("lexicon.wiegand.expanded.explicit.CSV", sep=",", header=0, index=False)
 
     os.chdir("../lexicon_manual")
-    rds_abusive.to_csv("lexicon.manual.all.abusive.CSV", sep=",", header=0, index=False)
+    rds_abusive.to_csv("lexicon.manual.all.explicit.CSV", sep=",", header=0, index=False)
 
     os.chdir(cwd)  # go back to previous cwd
 
