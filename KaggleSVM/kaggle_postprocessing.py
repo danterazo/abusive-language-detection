@@ -30,7 +30,7 @@ def calc_pct_abusive(data, decimals, verbose):
         data_explicit = boost_data(data_abusive, "", False, manual_boost=explicit_list)
 
         pct_explicit = round(len(data_explicit) / len(data_abusive) * 100, decimals)
-        pct_implicit = 100 - pct_explicit
+        pct_implicit = round(100 - pct_explicit, decimals)
 
         results_df.loc[len(results_df)] = [pct_explicit, pct_implicit, source_name]
         print(f"Computed.\n") if verbose else None
