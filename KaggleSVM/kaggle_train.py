@@ -123,8 +123,8 @@ def bin_data(data_with_preds, sample_type, i, analyzer, ngram_range):
     y_pred_implicit = implicit_data["pred"]
 
     # report results + export
-    report_explicit = pd.DataFrame(classification_report(y_explicit, y_pred_explicit, output_dict=True)).transpose()
-    report_implicit = pd.DataFrame(classification_report(y_implicit, y_pred_implicit, output_dict=True)).transpose()
+    report_explicit = pd.DataFrame(classification_report(y_explicit, y_pred_explicit, output_dict=True, zero_division=0)).transpose()
+    report_implicit = pd.DataFrame(classification_report(y_implicit, y_pred_implicit, output_dict=True, zero_division=0)).transpose()
 
     print(f"\nClassification Report[{sample_type}.explicit, {analyzer}, ngram_range{ngram_range}]:\n{report_explicit}\n")
     export_df(report_explicit, sample_type, f"{i}.explicit", folder="output/report", prefix="report")
