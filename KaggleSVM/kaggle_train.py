@@ -4,7 +4,7 @@
 from os import path
 
 from kaggle_postprocessing import calc_pct_abusive
-from kaggle_preprocessing import read_data
+from kaggle_preprocessing import read_data, boost_data
 from kaggle_build import build_train as build_datasets
 from kaggle_build import export_lexicons as build_lexicons
 from kaggle_build import export_df
@@ -59,8 +59,27 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
             sample_type = sample[1].lower()  # second member of tuple is a string
             print(f"===== {sample_type.capitalize()}-sample: pass {i} =====") if verbose else None
 
+
+            explicit_data, implicit_data = bin_data(data)
+            X_explicit = explicit_data["comment_text"]
+            X_implicit = implicit_data["comment_text"]
+            y_explicit = explicit_data["class"]
+            y_implicit = implicit_data["class"]
+
+            """ TODO
+            - using `lexicon.manual.all.explicit.CSV`
+            - new dataframe: [X, y, y_pred]
+            - For x in X:
+                - if y=1 and `x` contains any of the words in `explicit_list`, bin row as "explicit"
+                    - else, "implicit"
+                - if y=0, discard row
+            - two classification reports per cycle (18 total):
+                - `classification_report(y_implicit, y_pred_implicit)`
+                - `classification_report(y_explicit, y_pred_explicit)`
+            """
+
             # store data as vectors
-            X = data["comment_text"]  # initially reversed because it was easier to separate that way
+            X = data["comment_text"]
             y = data["class"]
 
             # model pipeline
@@ -80,7 +99,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
 
             # report results + export
             report = pd.DataFrame(classification_report(y, y_pred, output_dict=True)).transpose()
-            report = round_report_df(report_to_percentage(report), decimals)  # convert precision + recall columns to percentages + round
+            # report = round_report_df(report_to_percentage(report), decimals)  # convert precision + recall columns to percentages + round
 
             print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{report}\n")
             export_df(report, sample_type, i, path="output/report", prefix="report")
@@ -90,9 +109,25 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
         # average all reports of the same sample type (e.g. random1, random2, random3)
         print(f"===== {sample_type}-sample: Average of {len(reports_to_avg)} =====") if verbose else None
         averaged = pd.concat(reports_to_avg).groupby(level=0).mean()  # given a list of dataframes, average their values
-        averaged = round_report_df(averaged, decimals)  # convert precision + recall columns to percentages + round
+        # averaged = round_report_df(averaged, decimals)  # convert precision + recall columns to percentages + round
         export_df(averaged, sample_type, i=".avg", path="output/report", prefix="report")  # export the averaged report
         print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{averaged}\n")
+
+
+# given data, sort it into explicitly abusive and implicitly abusive datasets
+def bin_data(df):
+    data_abusive = df[df["class"] == 1]  # filter data to only abusive examples, i.e. discard non-abusive ones
+    explicit_list = open("data/lexicon_manual/lexicon.manual.all.explicit.CSV").read().splitlines()  # list of explicitly abusive words
+
+    data_explicit = boost_data(data_abusive, "", False, manual_boost=explicit_list)
+    data_implicit = pd.concat([data_abusive, data_explicit]).drop_duplicates(keep=False)
+
+    return data_explicit, data_implicit
+
+# continuing experiment with 2x the SVMs
+def double_SVM(df):
+
+    pass
 
 
 def report_to_percentage(report):
@@ -158,7 +193,7 @@ def main():
         rebuild = False  # rebuild datasets + export
         repeats = 3  # number of datasets per sample type
         verbose = True  # suppresses prints if FALSE
-        calc_pct = True  # calculate abusive example percentage per sample
+        calc_pct = True  # calculate abusive percentages
         decimals = 2  # number of decimals to round percentages to (e.g. abusive example percentages, in classification reports, etc.)
         sample_size = 20000
 

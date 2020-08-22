@@ -49,6 +49,12 @@ def sample_data(data, size):
     return data.sample(frac=1)[0:size]
 
 
+# TODO
+# given dataframe (X, y), filter to only explicitly abusive examples
+def get_explicit_abuse(df):
+    pass
+
+
 # boosts data, i.e. returns data that contains any word in given wordbank
 def boost_data(data, data_name, verbose=True, manual_boost=None):
     """
