@@ -117,10 +117,10 @@ left it in `kaggle_build.py` because it also exports them.
     - `data/lexicon_wiegand/`
         - `lexicon.wiegand.base.csv`
         - `lexicon.wiegand.expanded.csv`
-        - `lexicon.wiegand.base.abusive.csv`
-        - `lexicon.wiegand.expanded.abusive.csv`
+        - `lexicon.wiegand.base.explicit.csv`
+        - `lexicon.wiegand.expanded.explicit.csv`
     - `data/lexicon_manual/`
-        - `lexicon.manual.all.abusive.csv`
+        - `lexicon.manual.all.explicit.csv`
 
 #### `build_manual_lexicon()`
 Another wrapper function. This calls helper functions to import and process the manually-tagged lexicons. Finally,
@@ -237,7 +237,7 @@ This is where the magic happens. Fits CountVectorizer, trains SVM, and prints + 
     - `repeats` (*int*): controls the number of datasets built per sample type (if `rebuild` is **TRUE**)
     - `verbose` (*boolean*): toggles print statements
     - `sample_size` (*int*): size of sampled datasets. If set too high, the smaller size will be used
-    - `calc_pct` (*bool*): if **TRUE**, calculate percentage of abusive words in each sample
+    - `calc_pct` (*bool*): if **TRUE**, calculate percentage of explicitly abusive and implicitly abusive words in each sample
     - `decimals` (*int*): number of decimals to round percentages to
 - Return
     - None
