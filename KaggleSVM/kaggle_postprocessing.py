@@ -21,8 +21,6 @@ def calc_pct_abusive(data, decimals, verbose):
                      "data/lexicon_wiegand/lexicon.wiegand.base.explicit.CSV",
                      "data/lexicon_wiegand/lexicon.wiegand.expanded.explicit.CSV"]
 
-    # NOTE: tried multithreading, but performance improvement was negligible and it wasn't reliable
-    # TODO: joblib threading?
     for filename in lexicon_paths:
         print(f"Computing % abusive for {filename}...") if verbose else None
         filename_split = filename.split(".", 3)  # split filename into three parts: path, filename,
