@@ -56,8 +56,10 @@ def export_data(sample_name, data, extension=".CSV"):
 
 
 # generalized version of the above. `.CSV`
-def export_df(data, sample="no_sample", i="", path="", prefix="", index=True):
-    filepath = os.path.join(path, f"{prefix}.{sample}{i}.CSV")
+def export_df(data, sample="no_sample", i="", folder="", prefix="", index=True):
+    os.makedirs(folder) if not os.path.exists(folder) else None
+    filepath = os.path.join(folder, f"{prefix}.{sample}{i}.CSV")
+
     data.to_csv(filepath, index=index, header=True)
 
 
