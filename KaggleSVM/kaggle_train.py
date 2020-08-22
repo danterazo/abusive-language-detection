@@ -93,7 +93,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
         # average all reports of the same sample type (e.g. random1, random2, random3)
         print(f"===== {sample_type}-sample: Average of {len(reports_to_avg)} =====") if verbose else None
         averaged = pd.concat(reports_to_avg).groupby(level=0).mean()  # given a list of dataframes, average their values
-        averaged = round_report_df(averaged, decimals)  # convert precision + recall columns to percentages + round
+        # averaged = round_report_df(averaged, decimals)  # convert precision + recall columns to percentages + round
         export_df(averaged, sample_type, i=".avg", folder="output/report", prefix="report")  # export the averaged report
         print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{averaged}\n")
 
@@ -113,7 +113,7 @@ def bin_data_helper(df):
 # continuing experiment
 def bin_data(data_with_preds, sample_type, i, analyzer, ngram_range):
     # split data into explictly abusive and implictly abusive
-    data_with_preds["pred"] = pd.read_csv(path.join("output/pred", f"pred.{sample_type.lower()}{i}.CSV"))
+    data_with_preds["pred"] = pd.read_csv(path.join("output/pred", f"pred.{sample_type.lower()}{i}.CSV"))  # add preds as new column
 
     explicit_data, implicit_data = bin_data_helper(data_with_preds)
 
@@ -122,18 +122,6 @@ def bin_data(data_with_preds, sample_type, i, analyzer, ngram_range):
     y_pred_explicit = explicit_data["pred"]
     y_implicit = implicit_data["class"]
     y_pred_implicit = implicit_data["pred"]
-
-    """ TODO
-    - using `lexicon.manual.all.explicit.CSV`
-    - new dataframe: [X, y, y_pred]
-    - For x in X:
-        - if y=1 and `x` contains any of the words in `explicit_list`, bin row as "explicit"
-            - else, "implicit"
-        - if y=0, discard row
-    - two classification reports per cycle (18 total):
-        - `classification_report(y_implicit, y_pred_implicit)`
-        - `classification_report(y_explicit, y_pred_explicit)`
-    """
 
     # report results + export
     report_explicit = pd.DataFrame(classification_report(y_explicit, y_pred_explicit, output_dict=True)).transpose()
