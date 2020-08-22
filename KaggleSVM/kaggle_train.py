@@ -109,7 +109,7 @@ def bin_data_helper(df):
     return data_explicit, data_implicit
 
 
-# continuing experiment
+# binning experiment
 def bin_data(data_with_preds, sample_type, i, analyzer, ngram_range):
     # split data into explictly abusive and implictly abusive
     data_with_preds["pred"] = pd.read_csv(path.join("output/pred", f"pred.{sample_type.lower()}{i}.CSV"))  # add preds as new column
@@ -122,15 +122,16 @@ def bin_data(data_with_preds, sample_type, i, analyzer, ngram_range):
     y_implicit = implicit_data["class"]
     y_pred_implicit = implicit_data["pred"]
 
-    # report results + export
+    # reports
     report_explicit = pd.DataFrame(classification_report(y_explicit, y_pred_explicit, output_dict=True, zero_division=0)).transpose()
     report_implicit = pd.DataFrame(classification_report(y_implicit, y_pred_implicit, output_dict=True, zero_division=0)).transpose()
 
+    # print + export
     print(f"\nClassification Report[{sample_type}.explicit, {analyzer}, ngram_range{ngram_range}]:\n{report_explicit}\n")
-    export_df(report_explicit, sample_type, f"{i}.explicit", folder="output/report", prefix="report")
+    export_df(report_explicit, sample_type, f"{i}.explicit", folder="output/report/binning", prefix="report")
 
     print(f"\nClassification Report[{sample_type}.implicit, {analyzer}, ngram_range{ngram_range}]:\n{report_implicit}\n")
-    export_df(report_implicit, sample_type, f"{i}.implicit", folder="output/report", prefix="report")
+    export_df(report_implicit, sample_type, f"{i}.implicit", folder="output/report/binning", prefix="report")
 
 
 def report_to_percentage(report):
