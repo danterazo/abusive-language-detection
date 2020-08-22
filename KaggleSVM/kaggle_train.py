@@ -59,25 +59,6 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
             sample_type = sample[1].lower()  # second member of tuple is a string
             print(f"===== {sample_type.capitalize()}-sample: pass {i} =====") if verbose else None
 
-
-            explicit_data, implicit_data = bin_data(data)
-            X_explicit = explicit_data["comment_text"]
-            X_implicit = implicit_data["comment_text"]
-            y_explicit = explicit_data["class"]
-            y_implicit = implicit_data["class"]
-
-            """ TODO
-            - using `lexicon.manual.all.explicit.CSV`
-            - new dataframe: [X, y, y_pred]
-            - For x in X:
-                - if y=1 and `x` contains any of the words in `explicit_list`, bin row as "explicit"
-                    - else, "implicit"
-                - if y=0, discard row
-            - two classification reports per cycle (18 total):
-                - `classification_report(y_implicit, y_pred_implicit)`
-                - `classification_report(y_explicit, y_pred_explicit)`
-            """
-
             # store data as vectors
             X = data["comment_text"]
             y = data["class"]
@@ -88,8 +69,8 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
             svc = SVC(C=1000, kernel="rbf", gamma=0.001)  # GridSearch best params
             clf = Pipeline([('vect', vec), ('svm', svc)])
 
-            # testing + results
-            k = 5  # number of folds
+            # cross-validation
+            k = 5
 
             # calculate + export predictions
             y_pred = pred_helper(X, y, clf, k, sample_type, i, verbose)
@@ -102,20 +83,23 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
             # report = round_report_df(report_to_percentage(report), decimals)  # convert precision + recall columns to percentages + round
 
             print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{report}\n")
-            export_df(report, sample_type, i, path="output/report", prefix="report")
+            export_df(report, sample_type, i, folder="output/report", prefix="report")
             reports_to_avg.append(report)
+
+            bin_data(data, sample_type, i, analyzer, ngram_range)
+
             i += 1
 
         # average all reports of the same sample type (e.g. random1, random2, random3)
         print(f"===== {sample_type}-sample: Average of {len(reports_to_avg)} =====") if verbose else None
         averaged = pd.concat(reports_to_avg).groupby(level=0).mean()  # given a list of dataframes, average their values
-        # averaged = round_report_df(averaged, decimals)  # convert precision + recall columns to percentages + round
-        export_df(averaged, sample_type, i=".avg", path="output/report", prefix="report")  # export the averaged report
+        averaged = round_report_df(averaged, decimals)  # convert precision + recall columns to percentages + round
+        export_df(averaged, sample_type, i=".avg", folder="output/report", prefix="report")  # export the averaged report
         print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{averaged}\n")
 
 
 # given data, sort it into explicitly abusive and implicitly abusive datasets
-def bin_data(df):
+def bin_data_helper(df):
     data_abusive = df[df["class"] == 1]  # filter data to only abusive examples, i.e. discard non-abusive ones
     explicit_list = open("data/lexicon_manual/lexicon.manual.all.explicit.CSV").read().splitlines()  # list of explicitly abusive words
 
@@ -124,10 +108,42 @@ def bin_data(df):
 
     return data_explicit, data_implicit
 
-# continuing experiment with 2x the SVMs
-def double_SVM(df):
 
-    pass
+# TODO
+# continuing experiment
+def bin_data(data_with_preds, sample_type, i, analyzer, ngram_range):
+    # split data into explictly abusive and implictly abusive
+    data_with_preds["pred"] = pd.read_csv(path.join("output/pred", f"pred.{sample_type.lower()}{i}.CSV"))
+
+    explicit_data, implicit_data = bin_data_helper(data_with_preds)
+
+    # store data as vectors
+    y_explicit = explicit_data["class"]
+    y_pred_explicit = explicit_data["pred"]
+    y_implicit = implicit_data["class"]
+    y_pred_implicit = implicit_data["pred"]
+
+    """ TODO
+    - using `lexicon.manual.all.explicit.CSV`
+    - new dataframe: [X, y, y_pred]
+    - For x in X:
+        - if y=1 and `x` contains any of the words in `explicit_list`, bin row as "explicit"
+            - else, "implicit"
+        - if y=0, discard row
+    - two classification reports per cycle (18 total):
+        - `classification_report(y_implicit, y_pred_implicit)`
+        - `classification_report(y_explicit, y_pred_explicit)`
+    """
+
+    # report results + export
+    report_explicit = pd.DataFrame(classification_report(y_explicit, y_pred_explicit, output_dict=True)).transpose()
+    report_implicit = pd.DataFrame(classification_report(y_implicit, y_pred_implicit, output_dict=True)).transpose()
+
+    print(f"\nClassification Report[{sample_type}.explicit, {analyzer}, ngram_range{ngram_range}]:\n{report_explicit}\n")
+    export_df(report_explicit, sample_type, f"{i}.explicit", folder="output/report", prefix="report")
+
+    print(f"\nClassification Report[{sample_type}.implicit, {analyzer}, ngram_range{ngram_range}]:\n{report_implicit}\n")
+    export_df(report_implicit, sample_type, f"{i}.implicit", folder="output/report", prefix="report")
 
 
 def report_to_percentage(report):
@@ -152,8 +168,6 @@ def import_data(sample_type, n):
 
 
 def pred_helper(x, y, clf, k, sample_type, i, verbose):
-    X = x  # capitalized as it should be
-
     pred_path = path.join("output/pred/", f"pred.{sample_type.lower()}{i}.CSV")
     if path.exists(pred_path):
         print(f"Importing {sample_type}-sample SVM predictions...") if verbose else None
@@ -161,7 +175,7 @@ def pred_helper(x, y, clf, k, sample_type, i, verbose):
         print(f"Data imported!") if verbose else None
     else:
         print(f"Fitting CountVectorizer & training {sample_type}-sample SVM...") if verbose else None
-        y_pred = cross_val_predict(clf, X, y, cv=k, n_jobs=14)  # else, compute
+        y_pred = cross_val_predict(clf, x, y, cv=k, n_jobs=14)  # ...else, compute predictions
         pd.DataFrame(y_pred).to_csv(pred_path, index=False)  # save preds
         print(f"SVM trained!") if verbose else None
 
@@ -180,7 +194,7 @@ def pct_helper(data, sample_type, i, decimals, verbose):
         print(f"Percentages calculated!") if verbose else None
 
     print(f"{pct}")
-    export_df(pct, sample_type.lower(), i, path="output/stats/percent_abusive", prefix="percent", index=False)
+    export_df(pct, sample_type.lower(), i, folder="output/stats/percent_abusive", prefix="percent", index=False)
 
 
 # separate Main to protect variable names in inner scope
