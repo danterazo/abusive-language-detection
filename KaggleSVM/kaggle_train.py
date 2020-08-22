@@ -109,7 +109,6 @@ def bin_data_helper(df):
     return data_explicit, data_implicit
 
 
-# TODO
 # continuing experiment
 def bin_data(data_with_preds, sample_type, i, analyzer, ngram_range):
     # split data into explictly abusive and implictly abusive
@@ -141,7 +140,6 @@ def report_to_percentage(report):
 
 def round_report_df(report, decimals):
     report.iloc[:, [0, 1]] = report.iloc[:, [0, 1]].round(decimals)  # round select columns (precision, recall)
-    # TODO: round F1 score as well?
 
     return report
 
