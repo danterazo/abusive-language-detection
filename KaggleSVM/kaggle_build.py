@@ -11,7 +11,7 @@ import numpy as np
 
 # only import once
 def get_train():
-    dataset = "src/train.target+comments.tsv"  # 'test' for classification problem
+    dataset = "src/train.target+comments.TSV"  # 'test' for classification problem
     return read_data(dataset)
 
 
@@ -26,7 +26,7 @@ def build_random(data, sample_size, repeats=3):
 
 
 def build_boosted(data, manual_boost, sample_size, repeats=3):
-    data_file = "src/train.target+comments.tsv"  # name for verbose prints
+    data_file = "src/train.target+comments.TSV"  # name for verbose prints
     to_export = []
 
     # sample + export, topic
@@ -81,7 +81,7 @@ def build_manual_lexicon():
     cwd = os.getcwd()
 
     os.chdir("lexicon_manual")
-    files = glob.glob('*.{}'.format("csv")) + glob.glob('*.{}'.format("tsv"))
+    files = glob.glob('*.{}'.format("CSV")) + glob.glob('*.{}'.format("TSV"))
     dfs = []
 
     # assumes they're all the same length (551, as was the provided lexicon)
