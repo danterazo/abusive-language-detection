@@ -5,9 +5,7 @@ from os import path
 
 from kaggle_postprocessing import calc_pct_abusive
 from kaggle_preprocessing import boost_data
-from kaggle_build import build_train as build_datasets
-from kaggle_build import export_lexicons as build_lexicons
-from kaggle_build import export_df
+from kaggle_build import build_train as build_datasets, export_lexicons as build_lexicons, export_df
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import classification_report
@@ -40,7 +38,9 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
 
     # struct example: [([random1, random2, ..., random_n], "random"), ...]
     all_data = []
-    for x in ["kaggle_toxic.random", "kaggle_toxic.topic", "kaggle_toxic.wordbank"]:
+    samples = ["kaggle_toxic.random", "kaggle_toxic.wordbank"]
+
+    for x in samples:
         all_data.append((import_data(x, per_sample), x))
 
     # choose one or the other sample type if desired
@@ -83,10 +83,9 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
 
             # report results + export
             report = pd.DataFrame(classification_report(y, y_pred, output_dict=True)).transpose()
-            # report = round_report_df(report_to_percentage(report), decimals)  # convert precision + recall columns to percentages + round
 
             print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{report}\n")
-            export_df(report, sample_type, i, folder="output/report", prefix="report")
+            export_df(report, sample_type, i, folder="output_toxic/report", prefix="report")
             reports_to_avg.append(report)
 
             bin_data(data, sample_type, i, analyzer, ngram_range)
@@ -94,10 +93,9 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
             i += 1
 
         # average all reports of the same sample type (e.g. random1, random2, random3)
-        print(f"===== {sample_type}-sample: Average of {len(reports_to_avg)} =====") if verbose else None
+        print(f"===== {sample_type}-sample: Average of {len(reports_to_avg)} Sets =====") if verbose else None
         averaged = pd.concat(reports_to_avg).groupby(level=0).mean()  # given a list of dataframes, average their values
-        # averaged = round_report_df(averaged, decimals)  # convert precision + recall columns to percentages + round
-        export_df(averaged, sample_type, i=".avg", folder="output/report", prefix="report")  # export the averaged report
+        export_df(averaged, sample_type, i=".avg", folder="output_toxic/report", prefix="report")  # export the averaged report
         print(f"\nClassification Report[{sample_type}, {analyzer}, ngram_range{ngram_range}]:\n{averaged}\n")
 
 
@@ -106,7 +104,7 @@ def bin_data_helper(df):
     data_abusive = df[df["class"] == 1]  # filter data to only abusive examples, i.e. discard non-abusive ones
     explicit_list = open("data/lexicon_manual/lexicon.manual.all.explicit.CSV").read().splitlines()  # list of explicitly abusive words
 
-    data_explicit = boost_data(data_abusive, "", False, manual_boost=explicit_list)
+    data_explicit = boost_data(data_abusive, data_name="kaggle_toxic", manual_boost=explicit_list, verbose=False)
     data_implicit = pd.concat([data_abusive, data_explicit]).drop_duplicates(keep=False)
 
     return data_explicit, data_implicit
@@ -115,7 +113,7 @@ def bin_data_helper(df):
 # binning experiment
 def bin_data(data_with_preds, sample_type, i, analyzer, ngram_range):
     # split data into explictly abusive and implictly abusive
-    data_with_preds["pred"] = pd.read_csv(path.join("output/pred", f"pred.{sample_type.lower()}{i}.CSV"))  # add preds as new column
+    data_with_preds["pred"] = pd.read_csv(path.join("output_toxic/pred", f"pred.{sample_type.lower()}{i}.CSV"))  # add preds as new column
 
     explicit_data, implicit_data = bin_data_helper(data_with_preds)
 
@@ -131,10 +129,10 @@ def bin_data(data_with_preds, sample_type, i, analyzer, ngram_range):
 
     # print + export
     print(f"\nClassification Report[{sample_type}.explicit, {analyzer}, ngram_range{ngram_range}]:\n{report_explicit}\n")
-    export_df(report_explicit, sample_type, f"{i}.explicit", folder="output/report/binning", prefix="report")
+    export_df(report_explicit, sample_type, f"{i}.explicit", folder="output_toxic/report/binning", prefix="report")
 
     print(f"\nClassification Report[{sample_type}.implicit, {analyzer}, ngram_range{ngram_range}]:\n{report_implicit}\n")
-    export_df(report_implicit, sample_type, f"{i}.implicit", folder="output/report/binning", prefix="report")
+    export_df(report_implicit, sample_type, f"{i}.implicit", folder="output_toxic/report/binning", prefix="report")
 
 
 def report_to_percentage(report):
@@ -159,7 +157,7 @@ def import_data(sample_type, n):
 
 
 def pred_helper(x, y, clf, k, sample_type, i, verbose):
-    pred_path = path.join("output/pred/", f"pred.{sample_type.lower()}{i}.CSV")
+    pred_path = path.join("output_toxic/pred/", f"pred.{sample_type.lower()}{i}.CSV")
     if path.exists(pred_path):
         print(f"Importing {sample_type}-sample SVM predictions...") if verbose else None
         y_pred = pd.read_csv(pred_path)  # import if `y_pred` has already been computed
@@ -174,7 +172,7 @@ def pred_helper(x, y, clf, k, sample_type, i, verbose):
 
 
 def pct_helper(data, sample_type, i, decimals, verbose):
-    pct_path = path.join("output/stats/percent_abusive", f"percent.{sample_type.lower()}{i}.CSV")
+    pct_path = path.join("output_toxic/stats/percent_abusive", f"percent.{sample_type.lower()}{i}.CSV")
     if path.exists(pct_path):
         print(f"\nImporting {sample_type}-sample abusive content percentages...") if verbose else None
         pct = pd.read_csv(pct_path)  # import if already computed
@@ -185,7 +183,7 @@ def pct_helper(data, sample_type, i, decimals, verbose):
         print(f"Percentages calculated!") if verbose else None
 
     print(f"{pct}")
-    export_df(pct, sample_type.lower(), i, folder="output/stats/percent_abusive", prefix="percent", index=False)
+    export_df(pct, sample_type.lower(), i, folder="output_toxic/stats/percent_abusive", prefix="percent", index=False)
 
 
 # separate Main to protect variable names in inner scope
