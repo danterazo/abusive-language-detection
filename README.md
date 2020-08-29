@@ -64,7 +64,7 @@ This file exports data for later use. Included in the repo is prebuilt data, so 
 To run, set the `rebuild` flag in `kaggle_train.py` to **TRUE** then run the latter file.
 
 ### `build_train()`
-Builds and exports sampled training sets from large `train.csv` dataset
+Builds and exports sampled training sets from large `train.CSV` dataset
 - Params
     - `choice` (*str*): choose which sample types to build. "random", "boosted", or "all"
     - `topic` (*[str]*): list of strings to boost on
@@ -75,7 +75,7 @@ Builds and exports sampled training sets from large `train.csv` dataset
     - None
 
 #### `get_train()`
-Quick function to import `train.target+comments.tsv` + call `kaggle_preprocessing.read_data()` to format it.
+Quick function to import `train.target+comments.TSV` + call `kaggle_preprocessing.read_data()` to format it.
 - Params
     - None
 - Return
@@ -84,7 +84,7 @@ Quick function to import `train.target+comments.tsv` + call `kaggle_preprocessin
     - None
 
 #### `build_random()`
-Call `kaggle_preprocessing.sample_data()` to shuffle + cut `train.csv` down to desired sample size.
+Call `kaggle_preprocessing.sample_data()` to shuffle + cut `train.CSV` down to desired sample size.
 - Params
     - `data` (*df*): full training data to sample from
     - `sample_size` (*int*): upper bound for cutting result down to size
@@ -92,11 +92,11 @@ Call `kaggle_preprocessing.sample_data()` to shuffle + cut `train.csv` down to d
 - Return
     - None
 - Write
-    - `data/train.random{i}.csv` for index `i`
+    - `data/train.random{i}.CSV` for index `i`
     
 
 #### `build_boosted()`
-Call `kaggle_preprocessing.boost_data()` to boost `train.target+comments.tsv` on built-in wordbank or user-defined
+Call `kaggle_preprocessing.boost_data()` to boost `train.target+comments.TSV` on built-in wordbank or user-defined
 wordbank (passed as param `manual_boost`).
 - Params
     - `data` (*df*): full training data to sample from
@@ -106,7 +106,7 @@ wordbank (passed as param `manual_boost`).
 - Return
     - None
 - Write
-    - `data/train.boosted{i}.csv` for index `i`
+    - `data/train.boosted{i}.CSV` for index `i`
 
 
 ### `export_lexicons()`
@@ -118,12 +118,12 @@ left it in `kaggle_build.py` because it also exports them.
     - None
 - Write
     - `data/lexicon_wiegand/`
-        - `lexicon.wiegand.base.csv`
-        - `lexicon.wiegand.expanded.csv`
-        - `lexicon.wiegand.base.explicit.csv`
-        - `lexicon.wiegand.expanded.explicit.csv`
+        - `lexicon.wiegand.base.CSV`
+        - `lexicon.wiegand.expanded.CSV`
+        - `lexicon.wiegand.base.explicit.CSV`
+        - `lexicon.wiegand.expanded.explicit.CSV`
     - `data/lexicon_manual/`
-        - `lexicon.manual.all.explicit.csv`
+        - `lexicon.manual.all.explicit.CSV`
 
 #### `build_manual_lexicon()`
 Another wrapper function. This calls helper functions to import and process the manually-tagged lexicons. Finally,
@@ -145,7 +145,7 @@ Strips unnecessary columns from my manually-tagged lexicon.
     - None
 
 ##### `lexicon_dd()`
-Strips unnecessary columns from DD's manually-tagged lexicon (`.tsv`), then convert text classes to ints.
+Strips unnecessary columns from DD's manually-tagged lexicon (`.TSV`), then convert text classes to ints.
 - Params
     - `filename` (*str*): the name of the csv to be read
 - Return
@@ -154,7 +154,7 @@ Strips unnecessary columns from DD's manually-tagged lexicon (`.tsv`), then conv
     - None
 
 ##### `lexicon_schaede()`
-Strips unnecessary columns from Schaede's manually-tagged lexicon (`.csv`), then convert text classes to ints.
+Strips unnecessary columns from Schaede's manually-tagged lexicon (`.CSV`), then convert text classes to ints.
 - Params
     - `filename` (*str*): the name of the csv to be read
 - Return
@@ -167,7 +167,7 @@ Writes the given DataFrame to storage.
 - Params
     - `sample_name` (*str*): the name of the sample; used to construct filename
     - `data` (*df*): the DataFrame to export
-    - `extension` (*str*): the extension to save the df as. optional; defaults to `.csv`
+    - `extension` (*str*): the extension to save the df as. optional; defaults to `.CSV`
 - Return
     - None
 - Write
@@ -185,7 +185,7 @@ A more generalized version of `export_data()`. Doesn't prepend "train" to the fi
 - Return
     - None
 - Write
-    - `{path}/{prefix}.{sample}{i}.csv`
+    - `{path}/{prefix}.{sample}{i}.CSV`
 
 
 ## kaggle_preprocessing.py
@@ -193,7 +193,7 @@ This file reformats and cleans the data from `kaggle_build.py` into something th
 
 ### `read_data()`
 Reads given DataFrame line-by-line. Some comments have tabs or commas, and that can cause issues depending on the
-file delimiter. Removes entries with missing values (there's only 1 in `train.target+comments.tsv` without a score)
+file delimiter. Removes entries with missing values (there's only 1 in `train.target+comments.TSV` without a score)
 - Params
     - `dataset` (*str*): filename of dataset to import
     - `verbose` (*verbose*): toggles print statements; default **TRUE**
@@ -201,6 +201,15 @@ file delimiter. Removes entries with missing values (there's only 1 in `train.ta
     - Clean delimited data: (*df*)
 - Write
     - None
+    
+### `format_kaggle_toxicity()`
+Reads `kaggle_toxic` training file and cleans it up + applies the correct header names.
+- Params
+    _ None
+- Return
+    - None
+- Write
+    - `data/src_new/kaggle-toxic_train-clean.CSV`
 
 ### `sample_data()`
 Given a DataFrame, shuffle it and cut it down to the given size.
@@ -272,7 +281,7 @@ Helper function that checks for previously-computed `y_pred`. If it exists, prin
 - Return
     - None
 - Write
-    - `output/pred/pred.{sample_type}{i}.csv` if y_pred doesn't already exist for sample type and index `i`
+    - `output/pred/pred.{sample_type}{i}.CSV` if y_pred doesn't already exist for sample type and index `i`
 
 ### `pct_helper()`
 Helper function that checks for previously-computed abusive-content percentages. If it exists, print it; else, compute it.
@@ -284,7 +293,7 @@ Helper function that checks for previously-computed abusive-content percentages.
 - Return
     - None
 - Write
-    - `output/stats/percent_abusive/percent.{sample_type}{i}.csv` if percentage doesn't already exist for sample type and index `i`
+    - `output/stats/percent_abusive/percent.{sample_type}{i}.CSV` if percentage doesn't already exist for sample type and index `i`
 
 ### `main()`
 Wrapper, called from real main. Protects inner-scope variables in `fit_data()`
