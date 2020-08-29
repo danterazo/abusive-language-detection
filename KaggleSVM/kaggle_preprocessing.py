@@ -6,7 +6,7 @@ import re
 import pandas as pd
 
 
-# read + process training data
+# read + process training data (format: [class, comment])
 def read_data(dataset, verbose=True):
     data_dir = "data"  # common directory for all datasets
 
@@ -44,12 +44,23 @@ def read_data(dataset, verbose=True):
     return data
 
 
+# given kaggle toxicity data, format it to match the others
+def format_kaggle_toxicity():
+    kaggle_toxic = pd.read_csv("data/src_new/kaggle-toxic_train.CSV",
+                               names=["id", "comment_text", "toxic", "severe_toxic", "obscene", "threat", "insult", "identity_hate"])
+
+    kaggle_toxic = kaggle_toxic.drop("id", axis=1)
+    kaggle_toxic = kaggle_toxic.iloc[1:]  # remove first row (old headers/names)
+    kaggle_toxic.to_csv("data/src_new/kaggle-toxic_train-clean.CSV", index=0)
+
+
 # shuffle data then sample from it
 def sample_data(data, size):
     return data.sample(frac=1)[0:size]
 
+
 # boosts data, i.e. returns data that contains any word in given wordbank
-def boost_data(data, data_name, verbose=True, manual_boost=None):
+def boost_data(data, data_name, verbose=True, manual_boost=[]):
     """
     data (df):          dataset to filter
     topics ([str]]):    word(s) to filter with. this wordbank bypasses the banks below
@@ -104,20 +115,23 @@ def boost_data(data, data_name, verbose=True, manual_boost=None):
 
     if not manual_boost:
         # combine the above wordbanks
-        combined_topics = islam_wordbank + metoo_wordbank + politics_wordbank + history_wordbank + religion_wordbank + \
-                          sandra_wordbank + special_caps + explicitly_abusive
+        combined_topics = set(islam_wordbank + metoo_wordbank + politics_wordbank + history_wordbank + religion_wordbank + \
+                              sandra_wordbank + special_caps + explicitly_abusive)
     else:
         # use the given topics (arg)
-        combined_topics = manual_boost
+        combined_topics = set(manual_boost)
 
-    topic = combined_topics  # easy toggle if you want to focus on a specific topic instead
-    wordbank = list(dict.fromkeys(topic))  # remove dupes
+    wordbank = combined_topics  # easy toggle if you want to focus on a specific topic instead
 
     # wordbank = wordbank + ["#" + word for word in topic]  # ...then add hashtags for all words
-    wordbank = list(dict.fromkeys(wordbank))  # remove dupes again cause once isn't enough for some reason
     wordbank_regex = re.compile("|".join(wordbank), re.IGNORECASE)  # compile regex. case insensitive
 
     # idea: .find() for count. useful for threshold
     filtered_data = data[data["comment_text"].str.contains(wordbank_regex)]
     print(f"Data boosted to size {filtered_data.shape[0]}.\n") if verbose else None
     return filtered_data
+
+
+if __name__ == '__main__':
+    # format_kaggle_toxicity()
+    pass
