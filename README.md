@@ -1,3 +1,6 @@
+# WIP
+Working on making folder structure easier to follow + refactoring scripts.
+
 # Introduction & Research Goals 
 The goal of this project is to improve abusive language detection with a focus on implicit abuse. **Python** was used for data preprocessing, dataset builds, and SVM training. **R** was used to verify dataset properties (e.g. length, headers, etc.). The paper was written in and compiled from **LaTeX**.
 
