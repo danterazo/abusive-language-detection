@@ -1,4 +1,6 @@
 # WIP
+This README is out of date! Please check back in September.
+
 Working on making folder structure easier to follow + refactoring scripts.
 
 # Introduction & Research Goals 
