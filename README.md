@@ -1,7 +1,7 @@
 # WIP
-This README is out of date! Please check back in September.
+This code is a mess but it won't be for long. Check back in September!
 
-Working on making folder structure easier to follow + refactoring scripts.
+TODO: git LFS pull instructions / setup
 
 # Introduction & Research Goals 
 The goal of this project is to improve abusive language detection with a focus on implicit abuse. **Python** was used for data preprocessing, dataset builds, and SVM training. **R** was used to verify dataset properties (e.g. length, headers, etc.). The paper was written in and compiled from **LaTeX**.
@@ -356,7 +356,7 @@ but not the df (unused words)>
 - Write
     - None
 
-##### `get_words_set()`
+##### `get_words_list()`
 Given a DataFrame of the correct format, create a set of words used in its `comment_text` feature.
 - Params
     - `data` (*df*): the DataFrame to process
