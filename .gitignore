@@ -13,5 +13,10 @@ desktop.ini
 EMNLP Paper/
 KaggleSVM/sandbox
 KaggleSVM/TODO_SU20.md
-/KaggleSVM/data/src_new/
-KaggleSVM/kaggle_toxic_sandbox.py
+KaggleSVM/data/src_new/
+KaggleSVM/output/oov/abusive
+KaggleSVM/output/oov/all
+KaggleSVM/output/oov/non
+KaggleSVM/output_toxic/oov/abusive
+KaggleSVM/output_toxic/oov/all
+KaggleSVM/output_toxic/oov/non
