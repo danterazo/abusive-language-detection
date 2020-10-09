@@ -60,13 +60,13 @@ def sample_data(data, size):
 
 
 # boosts data, i.e. returns data that contains any word in given wordbank
-def boost_data(data, data_name, verbose=True, manual_boost=[]):
+def boost_data(data, data_name, manual_boost=[], verbose=True):
     """
     data (df):          dataset to filter
     topics ([str]]):    word(s) to filter with. this wordbank bypasses the banks below
     """
+    manual_boost_len = len(manual_boost)
     if verbose:
-        manual_boost_len = len(manual_boost)
         if manual_boost_len > 0:
             print(f"Boosting `{data_name}` on custom wordbank of size {manual_boost_len}...")
         else:
@@ -112,14 +112,13 @@ def boost_data(data, data_name, verbose=True, manual_boost=[]):
     # manually observed abusive words in explicit examples
     explicitly_abusive = ["sh*tty"]
 
-
-    if not manual_boost:
-        # combine the above wordbanks
-        combined_topics = set(islam_wordbank + metoo_wordbank + politics_wordbank + history_wordbank + religion_wordbank + \
-                              sandra_wordbank + special_caps + explicitly_abusive)
-    else:
+    if manual_boost_len > 0:
         # use the given topics (arg)
         combined_topics = set(manual_boost)
+    else:
+        # else, combine the built-in wordbanks
+        combined_topics = set(islam_wordbank + metoo_wordbank + politics_wordbank + history_wordbank + religion_wordbank + \
+                              sandra_wordbank + special_caps + explicitly_abusive)
 
     wordbank = combined_topics  # easy toggle if you want to focus on a specific topic instead
 

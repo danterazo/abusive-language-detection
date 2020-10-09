@@ -87,7 +87,6 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
             reports_to_avg.append(report)
 
             bin_data(data, sample_type, i, analyzer, ngram_range)
-
             i += 1
 
         # average all reports of the same sample type (e.g. random1, random2, random3)

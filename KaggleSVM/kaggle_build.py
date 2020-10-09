@@ -9,9 +9,9 @@ import pandas as pd
 import numpy as np
 
 
+# TODO: refactor
 # only import once
-def get_train():
-    dataset = "src/train.target+comments.TSV"  # 'test' for classification problem
+def get_train(dataset):
     return read_data(dataset)
 
 
@@ -22,27 +22,27 @@ def build_random(data, sample_size, repeats=3):
     for i in range(0, repeats):
         to_export.append(sample_data(data, sample_size))
 
-    export_data("random", to_export)
+    export_data("kaggle_toxic.random", to_export)
 
 
-def build_boosted(data, manual_boost, sample_size, repeats=3):
-    data_file = "src/train.target+comments.TSV"  # name for verbose prints
+def build_boosted(data, manual_boost, sample_size, filename, repeats=3):
     to_export = []
 
     # sample + export, topic
-    boosted_topic_data = boost_data(data, data_file, manual_boost)
+    boosted_topic_data = boost_data(data, filename, manual_boost)
     for i in range(0, repeats):
         to_export.append(sample_data(boosted_topic_data, sample_size))
 
-    export_data("topic", to_export)
+    export_data("kaggle_toxic.topic", to_export)
 
     # boost + sample + export, wordbank
-    boosted_wordbank_data = boost_data(data, data_file)
+    boosted_wordbank_data = boost_data(data, filename)
+    to_export = [] # start over
 
-    for i in range(0, repeats):
+    for j in range(0, repeats):
         to_export.append(sample_data(boosted_wordbank_data, sample_size))
 
-    export_data("wordbank", to_export)
+    export_data("kaggle_toxic.wordbank", to_export)
 
 
 # save data to `.TSV`, `.CSV`, etc.
@@ -51,7 +51,7 @@ def export_data(sample_name, data, extension=".CSV"):
 
     for d in data:
         filepath = os.path.join("data", f"train.{sample_name}{i}{extension}")
-        d.to_csv(filepath, index=False, header=False)
+        d.to_csv(filepath, index=False, header=True)
         i += 1
 
 
@@ -70,10 +70,13 @@ def build_train(choice, topic, repeats, sample_size, verbose):
     topic ([str]): topic for manual boosting
     repeats (int): number of datasets to build per sample type
     """
-    train = get_train()
+    # filename = "src/train.target+comments.TSV"
+    # train = get_train(filename)
+    filename = "data/src_new/kaggle-toxic_train-V2.CSV"
+    train = pd.read_csv(filename)
 
     build_random(train, sample_size, repeats) if choice is "random" or "all" else None
-    build_boosted(train, topic, sample_size, repeats) if choice is "boosted" or "all" else None
+    build_boosted(train, topic, sample_size, filename, repeats) if choice is "boosted" or "all" else None
     print(f"Datasets built.") if verbose else None
 
 
