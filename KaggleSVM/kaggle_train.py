@@ -134,17 +134,20 @@ def bin_data(data_with_preds, sample_type, i, analyzer, ngram_range):
     export_df(report_implicit, sample_type, f"{i}.implicit", folder="output/report/binning", prefix="report")
 
 
+# given a report dataframe, convert floats to percentages
 def report_to_percentage(report):
     report.iloc[:, [0, 1]] = report.iloc[:, [0, 1]] * 100  # float -> percentage on select columns (precision, recall)
     return report
 
 
+# given a report dataframe, round it
 def round_report_df(report, decimals):
     report.iloc[:, [0, 1]] = report.iloc[:, [0, 1]].round(decimals)  # round select columns (precision, recall)
 
     return report
 
 
+# read data into dataframes, then return a list of all those dataframes
 def import_data(sample_type, n):
     to_return = []
 
@@ -154,6 +157,7 @@ def import_data(sample_type, n):
     return to_return
 
 
+# get predictions
 def pred_helper(x, y, clf, k, sample_type, i, verbose):
     pred_path = path.join("output/pred/", f"pred.{sample_type.lower()}{i}.CSV")
     if path.exists(pred_path):
@@ -169,6 +173,7 @@ def pred_helper(x, y, clf, k, sample_type, i, verbose):
     return y_pred
 
 
+# get percent abusive
 def pct_helper(data, sample_type, i, decimals, verbose):
     pct_path = path.join("output/stats/percent_abusive", f"percent.{sample_type.lower()}{i}.CSV")
     if path.exists(pct_path):
