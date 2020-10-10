@@ -20,7 +20,7 @@ run = 1  # convenient flag at top of file
 def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, verbose, sample_size, calc_pct, decimals):
     """
     rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
-    samples ([str]):    three modes: "random", "boosted", or "all"
+    samples ([str]):    three modes: "random", "boosted", or "all" (both)
     analyzer (str):     either "word" or "char". for CountVectorizer
     ngram_range ((int,int)):    tuple containing lower and upper ngram bounds for CountVectorizer
     manual_boost ([str]):       use given list of strings for filtering instead of built-in wordbanks. Or pass `None`

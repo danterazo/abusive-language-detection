@@ -22,7 +22,7 @@ run = 1  # convenient flag at top of file
 def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, verbose, sample_size, calc_pct, decimals):
     """
     rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
-    samples ([str]):    three modes: "random", "boosted", or "all"
+    samples ([str]):    three modes: "random", "boosted", or "all" (both)
     analyzer (str):     either "word" or "char". for CountVectorizer
     ngram_range ((int,int)):    tuple containing lower and upper ngram bounds for CountVectorizer
     manual_boost ([str]):       use given list of strings for filtering instead of built-in wordbanks. Or pass `None`
@@ -102,7 +102,7 @@ def bin_data_helper(df):
     data_abusive = df[df["class"] == 1]  # filter data to only abusive examples, i.e. discard non-abusive ones
     explicit_list = open("data/lexicon_manual/lexicon.manual.all.explicit.CSV").read().splitlines()  # list of explicitly abusive words
 
-    data_explicit = boost_data(data_abusive, "", False, manual_boost=explicit_list)
+    data_explicit = boost_data(data_abusive, data_name="kaggle", manual_boost=explicit_list, verbose=False)
     data_implicit = pd.concat([data_abusive, data_explicit]).drop_duplicates(keep=False)
 
     return data_explicit, data_implicit
