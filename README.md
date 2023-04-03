@@ -69,6 +69,8 @@ Builds and exports sampled training sets from large `train.CSV` dataset
     - `sample_type` (*str*): choose which sample types to build. "random", "boosted", or "all"
     - `boost_topic` (*[str]*): list of strings to boost on
     - `repeats` (*int*): number of datasets to build per sample type
+    - `sample_size` (*int*): size of sampled datasets. If set too high, the smaller size will be used
+    - `verbose` (*bool*): verbosity flag. controls logging level
 - Return
     - None
 - Write
