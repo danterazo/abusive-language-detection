@@ -1,0 +1,4 @@
+[submodule "Repos/lexicon-of-abusive-words"]
+	path = Repos/lexicon-of-abusive-words
+	url = https://github.com/uds-lsv/lexicon-of-abusive-words.git
+	ignore = dirty

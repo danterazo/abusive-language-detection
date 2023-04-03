@@ -1,0 +1,33 @@
+# PyCharm
+.idea/
+
+# LaTeX
+*.aux
+*.log
+*.synctex.gz
+
+# Windows
+desktop.ini
+
+# R
+.RDataTmp
+.Rhistory
+.RData
+.RDataFiles/
+/KaggleSVM/supplementary/rlang/rlang.Rproj
+.Rproj.user/
+
+# Paper Submission
+EMNLP Paper Confidential/
+
+# Generated Files (Can easily be regenerated)
+KaggleSVM/data/src_new/
+KaggleSVM/output/oov/abusive
+KaggleSVM/output/oov/all
+KaggleSVM/output/oov/non
+KaggleSVM/output_toxic/oov/abusive
+KaggleSVM/output_toxic/oov/all
+KaggleSVM/output_toxic/oov/non
+
+# Class Notes
+KaggleSVM/TODO_SU20.md
