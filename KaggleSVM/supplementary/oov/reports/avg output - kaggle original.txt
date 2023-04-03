@@ -1,0 +1,9 @@
+kaggle_toxic.random Sets =======
+Average OOV (all):     4.243459946624984
+Average OOV (non):     4.178274454561144
+Average OOV (abusive): 12.241979253553712
+
+kaggle_toxic.wordbank Sets =======
+Average OOV (all):     3.1665126369786734
+Average OOV (non):     3.1895840039087284
+Average OOV (abusive): 9.647441525014637

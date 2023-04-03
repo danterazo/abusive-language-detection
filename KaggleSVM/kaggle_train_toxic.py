@@ -3,15 +3,16 @@
 # Dante Razo, drazo, 2020-05-15
 from os import path
 
-from kaggle_postprocessing import calc_pct_abusive
-from kaggle_preprocessing import boost_data
-from kaggle_build import build_train as build_datasets, export_lexicons as build_lexicons, export_df
+import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import classification_report
+from sklearn.model_selection import cross_val_predict
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
-import pandas as pd
+
+from kaggle_build import build_train as build_datasets, export_lexicons as build_lexicons, export_df
+from kaggle_postprocessing import calc_pct_abusive
+from kaggle_preprocessing import boost_data
 
 run = 1  # convenient flag at top of file
 
@@ -20,7 +21,7 @@ run = 1  # convenient flag at top of file
 def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, verbose, sample_size, calc_pct, decimals):
     """
     rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
-    samples ([str]):    three modes: "random", "boosted", or "all" (both)
+    samples ([str]):    three modes: "random", "boosted", or "all"
     analyzer (str):     either "word" or "char". for CountVectorizer
     ngram_range ((int,int)):    tuple containing lower and upper ngram bounds for CountVectorizer
     manual_boost ([str]):       use given list of strings for filtering instead of built-in wordbanks. Or pass `None`
@@ -44,9 +45,9 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
         all_data.append((import_data(x, per_sample), x))
 
     # choose one or the other sample type if desired
-    if samples is "random":
+    if samples == "random":
         all_data = all_data[0]
-    elif samples is "boosted":
+    elif samples == "boosted":
         all_data = all_data[1:2]
 
     for sample in all_data:  # for each sample type...
@@ -188,7 +189,7 @@ def pct_helper(data, sample_type, i, decimals, verbose):
 
 # separate Main to protect variable names in inner scope
 def main():
-    if run is 1:
+    if run == 1:
         samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
         analyzer = "word"  # "char" or "word"
         ngram_range = (1, 3,)  # int 2-tuple (couple)

@@ -24,7 +24,7 @@ def read_data(dataset, verbose=True):
             else:  # default: CSV
                 split_line = e.split(",", 1)
 
-            if len(split_line) is 2:  # else: there's no score, so throw the example out
+            if len(split_line) == 2:  # else: there's no score, so throw the example out
                 data_list.append([float(split_line[0].strip()), str(split_line[1])])
 
     data = pd.DataFrame(data_list, columns=["score", "comment_text"])

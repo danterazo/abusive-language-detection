@@ -1,35 +1,31 @@
-# WIP
-This code is a mess but it won't be for long. Check back in September!
-
-TODO: git LFS pull instructions / setup
-
 # Introduction & Research Goals 
 The goal of this project is to improve abusive language detection with a focus on implicit abuse. **Python** was used for data preprocessing, dataset builds, and SVM training. **R** was used to verify dataset properties (e.g. length, headers, etc.). The paper was written in and compiled from **LaTeX**.
 
+This repository contains all the resources you will need to replicate results. Boosting data takes a large amount of time depending on the lexicon used; I recommend using a computer with at least **4c/4t** and **16GB** of memory. This is merely a recommendation and not a requirement.
+
+This repo was originally created on October 30, 2019. I had to delete and recreate it to remove stranded Git LFS objects. RIP to 537 commits.
+
 ## Paper
-The paper is a WIP but will include detailed research methods, results, citations, and more.
+The publication can be viewed on the [ACL Anthology website](https://aclanthology.org/2020.alw-1.9/) or in the `Paper/` directory.
 
-Once the paper is accepted, see `Paper/` for a compiled PDF, uncompiled LaTeX, and assets.
-
-The plan is to submit this paper to the [_Fourth Workshop on Online Abuse and Harms_](https://www.aclweb.org/portal/content/fourth-workshop-online-abuse-and-harms) (WOAH), co-located with the 2020 conference on _Empirical Methods in Natural Language Processing_ (EMNLP 2020).
-
-## Results
-Work in progress. Stay tuned!
-
-# Code
-This repository contains all of the resources you will need to replicate results. Boosting data takes an absurd amount of time depending on the lexicon used; I recommend using a computer with at least **4c/4t** and **16GB** of memory. This is merely a recommendation and not a requirement.
+The paper was presented at the [_Fourth Workshop on Online Abuse and Harms_](https://www.aclweb.org/portal/content/fourth-workshop-online-abuse-and-harms) (WOAH), co-located with the 2020 conference on [_Empirical Methods in Natural Language Processing_](https://2020.emnlp.org/) (EMNLP 2020).
 
 ## Running the script
-1. Install dependencies
+1. Update code
+   - `git pull`
+   - `git submodule update --init`
+   - `git pull --recurse-submodules`
+
+2. Install dependencies
     - **Vanilla Python**: `pip3 install -r requirements.txt`
     - **Conda**:
       1. Select the desired conda `env` before installing (see `nlpGPU_env.yml` for my NLP-focused conda env)
       2. `conda install --file requirements.txt`
 
-2. Clone
+3. Clone
 - `git clone https://github.com/danterazo/abusive-language-detection.git`
   
-3. Configure
+4. Configure
     - See the `main()` in `kaggle_train.py`
         | Variable     | Data Type    | Default Value | Possible Values                                      | Purpose                                                      |
         | ------------ | ------------ | ------------- | ---------------------------------------------------- | ------------------------------------------------------------ |
@@ -38,18 +34,18 @@ This repository contains all of the resources you will need to replicate results
         | `ngram_range`  | *(int, int)* | **(1,3)**    | {i &#124; i &isin; Z<sup>+</sup>}                     | Couple (2-tuple) of lower and upper n-gram boundaries.           |
         | `manual_boost` | *[str]*      | **["trump"]** | a list of strings OR **None**          | If not **None**, override predefined wordbanks when boosting. |
         | `rebuild`      | *bool*       | **False**     | True, False                                          | If **True**, resample + rebuild training data and lexicons. The former is computationally expensive. |
-        | `repeats`      | *int*        | **3**         | {i &#124; i &isin; Z<sup>+</sup>, i > 0}             | Set the number of each sample type to build and train. Ignored if `rebuild` is **False**. |
+        | `per_sample`   | *int*        | **3**         | {i &#124; i &isin; Z<sup>+</sup>, i > 0}          | Set the number of each sample type to build and train. Ignored if `rebuild` is **False**. |
         | `sample_size`  | *int*        | **20000**     | {i &#124; i &isin; Z<sup>+</sup>, i > 0}             | Set the size of each dataset when building. If any set has <2000 examples, the others will be trimmed to match it. Ignored if `rebuild` is **False**. |
         | `verbose`      | *bool*       | **True**      | True, False                                          | Controls verbose print statements. Passed to other functions like a react prop. |
         | `calc_pct`     | *bool*       | **True**      | True, False                                          | If **True**, calculate the percentage of abusive words in each sample. Uses *manual*, *Wiegand Base*, and *Wiegand Extended* lexicons. Very computationally expensive. |
     
-4. Train
+5. Train
     - Once you've configured the script, simply run `kaggle_train.py`. No user input is required.
     - `python3 kaggle_train.py`
 
-5. Wait patiently for results
+6. Wait patiently for results
     - Percentage calculation (see `calc_pct` above) is time-consuming due to regex compilation and boosting step
-        - TODO: run in parallel (multithreaded)
+        - WIP: parallel / multithreaded calculation
     - **Rebuilt datasets** can be found in `data/`
     - **Class predictions** can be found in `output/pred/`
     - **Classification reports** can be found in `output/report/`
@@ -58,18 +54,20 @@ This repository contains all of the resources you will need to replicate results
 Throughout the code I refer to our manually-tagged lexicon, based off Wiegand's base lexicon, as either *manualLexicon*
 or *rds*, the latter being the initials of the contributors' last names (Dante Razo, DD, Leah Schaede).
 
+# Data
+I fit what I could into this repo. The untouched `train.csv` set is available upon request or [here](https://drive.google.com/drive/folders/1y2u_oVbiBpdnxl7zPFAbI685ovBp7BA2?usp=sharing).
 
-# Files
+# Code
 ## kaggle_build.py
 This file exports data for later use. Included in the repo is prebuilt data, so its not necessary to run this script.
 
-To run, set the `rebuild` flag in `kaggle_train.py` to **TRUE** then run the latter file.
+To run, set the `rebuild` flag in `KaggleSVM/kaggle_train.py` to **TRUE** then run the script.
 
 ### `build_train()`
 Builds and exports sampled training sets from large `train.CSV` dataset
 - Params
-    - `choice` (*str*): choose which sample types to build. "random", "boosted", or "all"
-    - `topic` (*[str]*): list of strings to boost on
+    - `sample_type` (*str*): choose which sample types to build. "random", "boosted", or "all"
+    - `boost_topic` (*[str]*): list of strings to boost on
     - `repeats` (*int*): number of datasets to build per sample type
 - Return
     - None

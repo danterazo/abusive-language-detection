@@ -4,12 +4,13 @@
 import glob
 import os
 
-from kaggle_preprocessing import read_data, boost_data, sample_data
-import pandas as pd
 import numpy as np
+import pandas as pd
+
+from kaggle_preprocessing import read_data, boost_data, sample_data
 
 
-# TODO: refactor
+# TODO: deprecated, remove
 # only import once
 def get_train(dataset):
     return read_data(dataset)
@@ -37,7 +38,7 @@ def build_boosted(data, manual_boost, sample_size, filename, repeats=3):
 
     # boost + sample + export, wordbank
     boosted_wordbank_data = boost_data(data, filename)
-    to_export = [] # start over
+    to_export = []  # start over
 
     for j in range(0, repeats):
         to_export.append(sample_data(boosted_wordbank_data, sample_size))
@@ -64,19 +65,19 @@ def export_df(data, sample="no_sample", i="", folder="", prefix="", index=True):
 
 
 # builds one or both
-def build_train(choice, topic, repeats, sample_size, verbose):
+def build_train(sample_type, boost_topic, repeats, sample_size, verbose):
     """
-    choice (str): choose which sample types to build. "random", "boosted", or "all"
-    topic ([str]): topic for manual boosting
+    sample_type (str): choose which sample types to build. "random", "boosted", or "all"
+    boost_topic ([str]): topic for manual boosting
     repeats (int): number of datasets to build per sample type
     """
-    # filename = "src/train.target+comments.TSV"
-    # train = get_train(filename)
-    filename = "data/src_new/kaggle-toxic_train-V2.CSV"
-    train = pd.read_csv(filename)
 
-    build_random(train, sample_size, repeats) if choice is "random" or "all" else None
-    build_boosted(train, topic, sample_size, filename, repeats) if choice is "boosted" or "all" else None
+    # train = get_train("src/train.target+comments.TSV")
+    src_filename = "data/src_new/kaggle-toxic_train-V2.CSV"
+    train = pd.read_csv(src_filename)
+
+    build_random(train, sample_size, repeats) if sample_type is "random" or "all" else None
+    build_boosted(train, boost_topic, sample_size, src_filename, repeats) if sample_type is "boosted" or "all" else None
     print(f"Datasets built.") if verbose else None
 
 

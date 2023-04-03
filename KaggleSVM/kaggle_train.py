@@ -3,17 +3,16 @@
 # Dante Razo, drazo, 2020-05-15
 from os import path
 
-from kaggle_postprocessing import calc_pct_abusive
-from kaggle_preprocessing import read_data, boost_data
-from kaggle_build import build_train as build_datasets
-from kaggle_build import export_lexicons as build_lexicons
-from kaggle_build import export_df
+import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import classification_report
+from sklearn.model_selection import cross_val_predict
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
-import pandas as pd
+
+from kaggle_build import build_train as build_datasets, export_lexicons as build_lexicons, export_df
+from kaggle_postprocessing import calc_pct_abusive
+from kaggle_preprocessing import read_data, boost_data
 
 run = 1  # convenient flag at top of file
 
@@ -21,16 +20,16 @@ run = 1  # convenient flag at top of file
 # for each fold of each dataset of each sample type, train an SVM
 def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, verbose, sample_size, calc_pct, decimals):
     """
-    rebuild (bool):     if TRUE, rebuild + rewrite the following datasets:
-    samples ([str]):    three modes: "random", "boosted", or "all" (both)
-    analyzer (str):     either "word" or "char". for CountVectorizer
+    rebuild (bool):             if TRUE, rebuild + rewrite the following datasets:
+    samples ([str]):            three modes: "random", "boosted", or "all"
+    analyzer (str):             either "word" or "char". for CountVectorizer
     ngram_range ((int,int)):    tuple containing lower and upper ngram bounds for CountVectorizer
     manual_boost ([str]):       use given list of strings for filtering instead of built-in wordbanks. Or pass `None`
     per_sample (int):           controls the number of datasets built per sample type (if `rebuild` is TRUE)
-    verbose (boolean):  toggles print statements
-    sample_size (int):  size of sampled datasets. If set too high, the smaller size will be used
-    calc_pct (bool):    if TRUE, calculate percentage of abusive words in each sample
-    decimals (int):     number of decimals to round percentages to
+    verbose (boolean):          toggles print statements
+    sample_size (int):          size of sampled datasets. If set too high, the smaller size will be used
+    calc_pct (bool):            if TRUE, calculate percentage of abusive words in each sample
+    decimals (int):             number of decimals to round percentages to
     """
 
     # rebuild datasets
@@ -41,12 +40,14 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
     # struct example: [([random1, random2, ..., random_n], "random"), ...]
     all_data = []
     for x in ["random", "topic", "wordbank"]:
-        all_data.append((import_data(x, per_sample), x))
+        all_data.append((import_data(sample_type=x,
+                                     n=per_sample),
+                         x))
 
     # choose one or the other sample type if desired
-    if samples is "random":
+    if samples == "random":
         all_data = all_data[0]
-    elif samples is "boosted":
+    elif samples == "boosted":
         all_data = all_data[1:2]
 
     for sample in all_data:  # for each sample type...
@@ -57,7 +58,7 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
         for set in sample[0]:  # for each set...
             data = pd.DataFrame(set)  # first member of tuple is the dataframe
             sample_type = sample[1].lower()  # second member of tuple is a string
-            print(f"===== {sample_type.capitalize()}-sample: pass {i} =====") if verbose else None
+            print(f"===== {sample_type.capitalize()}-sample: Set {i} =====") if verbose else None
 
             # store data as vectors
             X = data["comment_text"]
@@ -87,10 +88,11 @@ def fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, 
             reports_to_avg.append(report)
 
             bin_data(data, sample_type, i, analyzer, ngram_range)
+
             i += 1
 
         # average all reports of the same sample type (e.g. random1, random2, random3)
-        print(f"===== {sample_type}-sample: Average of {len(reports_to_avg)} =====") if verbose else None
+        print(f"===== {sample_type}-sample: Average of {len(reports_to_avg)} Sets =====") if verbose else None
         averaged = pd.concat(reports_to_avg).groupby(level=0).mean()  # given a list of dataframes, average their values
         # averaged = round_report_df(averaged, decimals)  # convert precision + recall columns to percentages + round
         export_df(averaged, sample_type, i=".avg", folder="output/report", prefix="report")  # export the averaged report
@@ -151,7 +153,10 @@ def import_data(sample_type, n):
     to_return = []
 
     for i in range(1, n + 1):
-        to_return.append(read_data(f"train.{sample_type}{i}.CSV", verbose=False))
+        to_return.append(read_data(
+            dataset=f"train.{sample_type}{i}.CSV",
+            verbose=False)
+        )
 
     return to_return
 
@@ -190,19 +195,19 @@ def pct_helper(data, sample_type, i, decimals, verbose):
 
 # separate Main to protect variable names in inner scope
 def main():
-    if run is 1:
+    if run == 1:
         samples = "all"  # "random", "boosted_topic", "boosted_wordbank", or "all"
         analyzer = "word"  # "char" or "word"
         ngram_range = (1, 3,)  # int 2-tuple (couple)
         manual_boost = ["trump"]  # None, or a list of strings
         rebuild = False  # rebuild datasets + export
-        repeats = 3  # number of datasets per sample type
+        per_sample = 3  # number of datasets per sample type
         verbose = True  # suppresses prints if FALSE
         calc_pct = True  # calculate abusive percentages
         decimals = 2  # number of decimals to round percentages to (e.g. abusive example percentages, in classification reports, etc.)
         sample_size = 20000
 
-        fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, repeats, verbose, sample_size, calc_pct, decimals)
+        fit_data(rebuild, samples, analyzer, ngram_range, manual_boost, per_sample, verbose, sample_size, calc_pct, decimals)
 
 
 # need main for future multithreaded function calls

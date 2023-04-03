@@ -1,23 +1,22 @@
 # LING-X 490
 # This file takes built data and reformats / averages / analyzes it
 # Dante Razo, drazo
-from os import path
 import os
 import re
+from os import path
 from statistics import mean, stdev, variance
 
-from kaggle_preprocessing import boost_data
-from sklearn.model_selection import KFold
 import pandas as pd
+from sklearn.model_selection import KFold
+
+from kaggle_preprocessing import boost_data
 
 
 # calculate % examples in given data that contains abusive words. returns df
 def calc_pct_abusive(data, decimals, verbose):
     only_abusive = data[data["class"] == 1]  # filter data to only abusive examples
-    only_nonabusive = data[data["class"] == 0]  # filter data to only non-abusive examples
 
     results_df = pd.DataFrame(columns=["pct_explicit_abusiveonly", "pct_implicit_abusiveonly",
-                                       "pct_explicit_nonabusiveonly", "pct_implicit_nonabusiveonly",
                                        "pct_explicit_alldata", "pct_implicit_alldata", "source_lexicon"])
 
     lexicon_paths = ["data/lexicon_manual/lexicon.manual.all.explicit.CSV",
@@ -31,21 +30,16 @@ def calc_pct_abusive(data, decimals, verbose):
 
         explicit_list = open(filename).read().splitlines()  # list of explicitly abusive words
         explicit_abusiveonly = boost_data(only_abusive, data_name="", manual_boost=explicit_list, verbose=False)
-        explicit_nonabusiveonly = boost_data(only_nonabusive, data_name="", manual_boost=explicit_list, verbose=False) # TODO
         explicit_wholedata = boost_data(data, data_name="", manual_boost=explicit_list, verbose=False)
 
         pct_explicit_abusiveonly = round(len(explicit_abusiveonly) / len(only_abusive) * 100, decimals)
         pct_implicit_abusiveonly = round(100 - pct_explicit_abusiveonly, decimals)
 
-        pct_explicit_nonabusiveonly = round(len(explicit_nonabusiveonly) / len(only_nonabusive) * 100, decimals)
-        pct_implicit_nonabusiveonly = round(100 - pct_explicit_nonabusiveonly, decimals)
-
         pct_explicit_alldata = round(len(explicit_wholedata) / len(data) * 100, decimals)
         pct_implicit_alldata = round(100 - pct_explicit_alldata, decimals)
 
-        results_df.loc[len(results_df)] = [pct_explicit_abusiveonly, pct_implicit_abusiveonly,
-                                           pct_explicit_nonabusiveonly, pct_implicit_nonabusiveonly,
-                                           pct_explicit_alldata, pct_implicit_alldata, source_name]
+        results_df.loc[len(results_df)] = [pct_explicit_abusiveonly, pct_implicit_abusiveonly, pct_explicit_alldata, pct_implicit_alldata,
+                                           source_name]
         print(f"Computed.\n") if verbose else None
 
     return results_df
@@ -67,7 +61,7 @@ def calc_oov(k, decimals, verbose):
     subsets = ["all", "abusive", "non"]
 
     for source in sources:
-        if source is "kaggle_toxic":
+        if source == "kaggle_toxic":
             sample_types = ["random", "wordbank"]
 
         for s in sample_types:
@@ -76,7 +70,7 @@ def calc_oov(k, decimals, verbose):
                     oov_folder = f"output/stats/oov/"
                     filename = f"train.{s}{i}.CSV"
 
-                    if source is "kaggle_toxic":
+                    if source == "kaggle_toxic":
                         oov_folder = f"output_toxic/stats/oov/"
                         filename = f"train.kaggle_toxic.{s}{i}.CSV"
 
@@ -86,16 +80,16 @@ def calc_oov(k, decimals, verbose):
                         print(f"OOV already computed for {filename}. Skipping...")
                     else:
                     """
-                    if source is "kaggle":
+                    if source == "kaggle":
                         data = pd.read_csv(f"data/{filename}", names=["class", "comment_text"])
                     else:
                         data = pd.read_csv(f"data/{filename}", header=0)  # toxic dataset
 
                     """
-                    if subset is "non":
+                    if subset == "non":
                         data = data[data["class"] == 0]  # non-abusive data only
                         print(f"non: {data}")
-                    elif subset is "abusive":
+                    elif subset == "abusive":
                         data = data[data["class"] == 1]  # abusive data only
                         print(f"ab: {data}")
                     """
@@ -109,11 +103,11 @@ def calc_oov(k, decimals, verbose):
                         curr_fold_name = f"{filename}:fold{curr_fold_num}"
                         train, test = f
 
-                        if subset is "non":
+                        if subset == "non":
                             train = train[train["class"] == 0]  # non-abusive data only
                             test = test[test["class"] == 0]
                             # print(f"non train:\n{train}\nnon test:\n{test}")
-                        elif subset is "abusive":
+                        elif subset == "abusive":
                             train = train[train["class"] == 1]  # abusive data only
                             test = test[test["class"] == 1]
                             # print(f"ab train:\n{train}\nab test:\n{test}")

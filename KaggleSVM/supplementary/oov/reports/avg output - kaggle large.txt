@@ -1,0 +1,14 @@
+Averages of kaggle.random Sets =======
+Average OOV (all):     2.655885060001904
+Average OOV (non):     2.76677065429136
+Average OOV (abusive): 9.259246634841844
+
+Averages of kaggle.topic Sets =======
+Average OOV (all):     1.8754319060302893
+Average OOV (non):     2.0170543774589915
+Average OOV (abusive): 5.274376927772154
+
+Averages of kaggle.wordbank Sets =======
+Average OOV (all):     2.1700238668725134
+Average OOV (non):     2.2707603651844197
+Average OOV (abusive): 7.361526737414743

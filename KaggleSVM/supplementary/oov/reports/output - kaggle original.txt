@@ -1,0 +1,29 @@
+kaggle_toxic.random1 Set =======
+Average OOV (all):     4.1186758030347255
+Average OOV (non):     4.093289863943037
+Average OOV (abusive): 11.244817902512146
+
+kaggle_toxic.random2 Set =======
+Average OOV (all):     4.199031741032771
+Average OOV (non):     4.075671880933108
+Average OOV (abusive): 12.910682401301495
+
+kaggle_toxic.random3 Set =======
+Average OOV (all):     4.197896457506672
+Average OOV (non):     4.150227100800853
+Average OOV (abusive): 12.113207875611382
+
+kaggle_toxic.wordbank1 Set =======
+Average OOV (all):     3.111574234989028
+Average OOV (non):     3.1449392361123003
+Average OOV (abusive): 9.57200476069163
+
+kaggle_toxic.wordbank2 Set =======
+Average OOV (all):     3.127120511300095
+Average OOV (non):     3.1452467910213744
+Average OOV (abusive): 9.48816358241531
+
+kaggle_toxic.wordbank3 Set =======
+Average OOV (all):     3.1289408751265344
+Average OOV (non):     3.1454183571749708
+Average OOV (abusive): 9.494920136912857
