@@ -65,11 +65,13 @@ def export_df(data, sample="no_sample", i="", folder="", prefix="", index=True):
 
 
 # builds one or both
-def build_train(sample_type, boost_topic, repeats, sample_size, verbose):
+def build_train(sample_type, boost_topic, repeats, sample_size, verbose=True):
     """
-    sample_type (str): choose which sample types to build. "random", "boosted", or "all"
-    boost_topic ([str]): topic for manual boosting
-    repeats (int): number of datasets to build per sample type
+    sample_type (str):      choose which sample types to build. "random", "boosted", or "all"
+    boost_topic ([str]):    topic for manual boosting
+    repeats (int):          number of datasets to build per sample type
+    sample_size (int):      size of sampled datasets. If set too high, the smaller size will be used
+    verbose (bool):         verbosity flag. controls logging level
     """
 
     # train = get_train("src/train.target+comments.TSV")
